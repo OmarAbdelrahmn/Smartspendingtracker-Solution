@@ -1,8 +1,412 @@
-﻿@{
-    ViewData["Title"] = "Home Page";
+﻿@model DashboardViewModel
+@{
+    ViewData["Title"] = "Dashboard";
 }
 
-<div class="text-center">
-    <h1 class="display-4">Welcome</h1>
-    <p>Learn about <a href="https://learn.microsoft.com/aspnet/core">building Web apps with ASP.NET Core</a>.</p>
+<div class="container-fluid">
+    <!-- Header -->
+    <div class="row mb-4">
+        <div class="col-12">
+            <div class="d-flex justify-content-between align-items-center flex-wrap">
+                <div>
+                    <h2 class="mb-1">
+                        <i class="fas fa-chart-line me-2"></i>
+                        Dashboard
+                    </h2>
+                    <p class="text-muted mb-0">
+                        <i class="far fa-calendar-alt me-1"></i>
+                        @Model.CurrentMonthName @Model.CurrentYear
+                    </p>
+                </div>
+                <div class="mt-2 mt-md-0">
+                    <a asp-action="Create" class="btn btn-primary btn-lg shadow-sm">
+                        <i class="fas fa-plus-circle me-2"></i>
+                        Add Expense
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Statistics Cards -->
+    <div class="row mb-4">
+        <div class="col-md-4 mb-3 mb-md-0">
+            <div class="card stat-card shadow-sm">
+                <div class="card-body">
+                    <div class="stat-icon mb-3">
+                        <i class="fas fa-money-bill-wave fa-3x" style="color: var(--primary-color);"></i>
+                    </div>
+                    <div class="stat-label">Total Spending This Month</div>
+                    <div class="stat-value">@Model.TotalSpendingThisMonth.ToString("N2") EGP</div>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-4 mb-3 mb-md-0">
+            <div class="card stat-card shadow-sm">
+                <div class="card-body">
+                    <div class="stat-icon mb-3">
+                        <i class="fas fa-tags fa-3x" style="color: var(--success-color);"></i>
+                    </div>
+                    <div class="stat-label">Categories Used</div>
+                    <div class="stat-value">@Model.SpendingByCategory.Count</div>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div class="card stat-card shadow-sm">
+                <div class="card-body">
+                    <div class="stat-icon mb-3">
+                        <i class="fas fa-receipt fa-3x" style="color: var(--warning-color);"></i>
+                    </div>
+                    <div class="stat-label">Total Transactions</div>
+                    <div class="stat-value">@Model.LatestExpenses.Count</div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Charts Row -->
+    <div class="row mb-4">
+        <div class="col-lg-6 mb-3 mb-lg-0">
+            <div class="card shadow-sm">
+                <div class="card-header bg-white">
+                    <h5 class="mb-0">
+                        <i class="fas fa-chart-pie me-2"></i>
+                        Spending by Category
+                    </h5>
+                </div>
+                <div class="card-body">
+                    @if (Model.SpendingByCategory.Any())
+                    {
+                        <canvas id="categoryChart" height="250"></canvas>
+                    }
+                    else
+                    {
+                        <div class="text-center py-5 text-muted">
+                            <i class="fas fa-chart-pie fa-3x mb-3 opacity-25"></i>
+                            <p class="mb-0">No expenses yet. Start tracking!</p>
+                        </div>
+                    }
+                </div>
+            </div>
+        </div>
+        <div class="col-lg-6">
+            <div class="card shadow-sm">
+                <div class="card-header bg-white">
+                    <h5 class="mb-0">
+                        <i class="fas fa-money-bill-wave me-2"></i>
+                        Spending by Currency
+                    </h5>
+                </div>
+                <div class="card-body">
+                    @if (Model.SpendingByCurrency.Any())
+                    {
+                        <canvas id="currencyChart" height="250"></canvas>
+                    }
+                    else
+                    {
+                        <div class="text-center py-5 text-muted">
+                            <i class="fas fa-coins fa-3x mb-3 opacity-25"></i>
+                            <p class="mb-0">No currency data available</p>
+                        </div>
+                    }
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Latest Expenses -->
+    <div class="row">
+        <div class="col-12">
+            <div class="card shadow-sm">
+                <div class="card-header bg-white d-flex justify-content-between align-items-center flex-wrap">
+                    <h5 class="mb-0">
+                        <i class="fas fa-list me-2"></i>
+                        Recent Expenses
+                    </h5>
+                    @if (Model.LatestExpenses.Any())
+                    {
+                        <span class="badge bg-primary rounded-pill mt-2 mt-md-0">
+                            @Model.LatestExpenses.Count expense@(Model.LatestExpenses.Count != 1 ? "s" : "")
+                        </span>
+                    }
+                </div>
+                <div class="card-body p-0">
+                    @if (Model.LatestExpenses.Any())
+                    {
+                        <div class="table-responsive">
+                            <table class="table table-hover mb-0 align-middle">
+                                <thead class="table-light">
+                                    <tr>
+                                        <th width="60" class="text-center">Icon</th>
+                                        <th>Description</th>
+                                        <th>Category</th>
+                                        <th class="text-end">Amount</th>
+                                        <th class="text-end">In EGP</th>
+                                        <th>Date</th>
+                                        <th class="text-center">Source</th>
+                                        <th width="80" class="text-center">Actions</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    @foreach (var expense in Model.LatestExpenses)
+                                    {
+                                        <tr>
+                                            <td class="text-center">
+                                                <div class="expense-icon mx-auto" style="background-color: @expense.CategoryColor;">
+                                                    <i class="fas @expense.CategoryIcon"></i>
+                                                </div>
+                                            </td>
+                                            <td>
+                                                <div class="fw-semibold text-truncate" style="max-width: 200px;" title="@expense.Description">
+                                                    @expense.Description
+                                                </div>
+                                            </td>
+                                            <td>
+                                                <span class="badge rounded-pill" style="background-color: @expense.CategoryColor;">
+                                                    @expense.CategoryName
+                                                </span>
+                                            </td>
+                                            <td class="text-end fw-bold">
+                                                @expense.Amount.ToString("N2")
+                                                <span class="text-muted small">@expense.Currency</span>
+                                            </td>
+                                            <td class="text-end text-muted">
+                                                @expense.ConvertedAmountInEGP.ToString("N2")
+                                                <span class="small">EGP</span>
+                                            </td>
+                                            <td>
+                                                <small class="text-muted">
+                                                    <i class="far fa-clock me-1"></i>
+                                                    @expense.DateTime.ToString("MMM dd, hh:mm tt")
+                                                </small>
+                                            </td>
+                                            <td class="text-center">
+                                                @if (expense.IsFromChat)
+                                                {
+                                                    <span class="badge bg-info rounded-pill">
+                                                        <i class="fas fa-comment me-1"></i>Chat
+                                                    </span>
+                                                }
+                                                else
+                                                {
+                                                    <span class="badge bg-secondary rounded-pill">
+                                                        <i class="fas fa-keyboard me-1"></i>Manual
+                                                    </span>
+                                                }
+                                            </td>
+                                            <td class="text-center">
+                                                <button class="btn btn-sm btn-outline-danger"
+                                                        onclick="deleteExpense(@expense.Id)"
+                                                        title="Delete expense">
+                                                    <i class="fas fa-trash-alt"></i>
+                                                </button>
+                                            </td>
+                                        </tr>
+                                    }
+                                </tbody>
+                            </table>
+                        </div>
+                    }
+                    else
+                    {
+                        <div class="text-center py-5">
+                            <div class="mb-4">
+                                <i class="fas fa-inbox fa-4x text-muted opacity-25"></i>
+                            </div>
+                            <h5 class="text-muted mb-2">No expenses yet</h5>
+                            <p class="text-muted mb-4">Start tracking your spending by adding your first expense!</p>
+                            <div class="d-flex gap-2 justify-content-center flex-wrap">
+                                <a asp-action="Create" class="btn btn-primary">
+                                    <i class="fas fa-plus-circle me-2"></i>
+                                    Add Your First Expense
+                                </a>
+                                <button class="btn btn-outline-primary" onclick="document.getElementById('chatInput').focus()">
+                                    <i class="fas fa-comment me-2"></i>
+                                    Use Quick Chat
+                                </button>
+                            </div>
+                        </div>
+                    }
+                </div>
+            </div>
+        </div>
+    </div>
 </div>
+
+@section Scripts {
+    @if (Model.SpendingByCategory.Any())
+    {
+        <script>
+            // Category Chart - Doughnut
+            const categoryCtx = document.getElementById('categoryChart');
+            if (categoryCtx) {
+                new Chart(categoryCtx, {
+                    type: 'doughnut',
+                    data: {
+                        labels: @Html.Raw(Json.Serialize(Model.SpendingByCategory.Keys)),
+                        datasets: [{
+                            data: @Html.Raw(Json.Serialize(Model.SpendingByCategory.Values)),
+                            backgroundColor: [
+                                '#FF6B6B',
+                                '#4ECDC4',
+                                '#95E1D3',
+                                '#F38181',
+                                '#AA96DA',
+                                '#6C757D',
+                                '#FFD93D',
+                                '#6BCF7F'
+                            ],
+                            borderWidth: 3,
+                            borderColor: '#fff',
+                            hoverOffset: 10
+                        }]
+                    },
+                    options: {
+                        responsive: true,
+                        maintainAspectRatio: false,
+                        plugins: {
+                            legend: {
+                                position: 'bottom',
+                                labels: {
+                                    padding: 15,
+                                    font: {
+                                        size: 13,
+                                        family: "'Segoe UI', Tahoma, Geneva, Verdana, sans-serif"
+                                    },
+                                    usePointStyle: true,
+                                    pointStyle: 'circle'
+                                }
+                            },
+                            tooltip: {
+                                backgroundColor: 'rgba(0, 0, 0, 0.8)',
+                                padding: 12,
+                                titleFont: {
+                                    size: 14,
+                                    weight: 'bold'
+                                },
+                                bodyFont: {
+                                    size: 13
+                                },
+                                callbacks: {
+                                    label: function(context) {
+                                        const total = context.dataset.data.reduce((a, b) => a + b, 0);
+                                        const percentage = ((context.parsed / total) * 100).toFixed(1);
+                                        return context.label + ': ' + context.parsed.toFixed(2) + ' EGP (' + percentage + '%)';
+                                    }
+                                }
+                            }
+                        }
+                    }
+                });
+            }
+        </script>
+    }
+
+    @if (Model.SpendingByCurrency.Any())
+    {
+        <script>
+            // Currency Chart - Bar
+            const currencyCtx = document.getElementById('currencyChart');
+            if (currencyCtx) {
+                new Chart(currencyCtx, {
+                    type: 'bar',
+                    data: {
+                        labels: @Html.Raw(Json.Serialize(Model.SpendingByCurrency.Keys)),
+                        datasets: [{
+                            label: 'Amount Spent',
+                            data: @Html.Raw(Json.Serialize(Model.SpendingByCurrency.Values)),
+                            backgroundColor: [
+                                'rgba(74, 144, 226, 0.8)',
+                                'rgba(40, 167, 69, 0.8)',
+                                'rgba(255, 193, 7, 0.8)'
+                            ],
+                            borderColor: [
+                                'rgba(74, 144, 226, 1)',
+                                'rgba(40, 167, 69, 1)',
+                                'rgba(255, 193, 7, 1)'
+                            ],
+                            borderWidth: 2,
+                            borderRadius: 8,
+                            borderSkipped: false
+                        }]
+                    },
+                    options: {
+                        responsive: true,
+                        maintainAspectRatio: false,
+                        plugins: {
+                            legend: {
+                                display: false
+                            },
+                            tooltip: {
+                                backgroundColor: 'rgba(0, 0, 0, 0.8)',
+                                padding: 12,
+                                titleFont: {
+                                    size: 14,
+                                    weight: 'bold'
+                                },
+                                bodyFont: {
+                                    size: 13
+                                },
+                                callbacks: {
+                                    label: function(context) {
+                                        return 'Amount: ' + context.parsed.y.toFixed(2) + ' ' + context.label;
+                                    }
+                                }
+                            }
+                        },
+                        scales: {
+                            y: {
+                                beginAtZero: true,
+                                grid: {
+                                    color: 'rgba(0, 0, 0, 0.05)'
+                                },
+                                ticks: {
+                                    font: {
+                                        size: 12
+                                    },
+                                    callback: function(value) {
+                                        return value.toFixed(0);
+                                    }
+                                }
+                            },
+                            x: {
+                                grid: {
+                                    display: false
+                                },
+                                ticks: {
+                                    font: {
+                                        size: 13,
+                                        weight: 'bold'
+                                    }
+                                }
+                            }
+                        }
+                    }
+                });
+            }
+        </script>
+    }
+
+    <script>
+        // Smooth scroll to top on load
+        window.scrollTo({ top: 0, behavior: 'smooth' });
+
+        // Add animation to stat cards on load
+        document.addEventListener('DOMContentLoaded', function() {
+            const statCards = document.querySelectorAll('.stat-card');
+            statCards.forEach((card, index) => {
+                setTimeout(() => {
+                    card.style.opacity = '0';
+                    card.style.transform = 'translateY(20px)';
+                    card.style.transition = 'all 0.4s ease-out';
+
+                    setTimeout(() => {
+                        card.style.opacity = '1';
+                        card.style.transform = 'translateY(0)';
+                    }, 50);
+                }, index * 100);
+            });
+        });
+    </script>
+}
