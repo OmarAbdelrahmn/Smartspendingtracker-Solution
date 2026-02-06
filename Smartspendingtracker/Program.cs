@@ -1,4 +1,6 @@
 using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.Diagnostics;
+using Microsoft.Extensions.Options;
 using Smartspendingtracker;
 using SmartSpendingTracker.Services;
 
@@ -7,17 +9,22 @@ var builder = WebApplication.CreateBuilder(args);
 // Add services to the container
 builder.Services.AddControllersWithViews();
 
-// Configure database
-builder.Services.AddDbContext<ApplicationDbContext>(options =>
+ builder.Services.AddDbContext<ApplicationDbContext>(options =>
+{
     options.UseSqlServer(
         builder.Configuration.GetConnectionString("DefaultConnection"),
         sqlOptions => sqlOptions.EnableRetryOnFailure()
-    ));
+    );
+
+    options.ConfigureWarnings(warnings =>
+        warnings.Ignore(RelationalEventId.PendingModelChangesWarning));
+});
 
 // Register application services
 builder.Services.AddScoped<ChatParsingService>();
 builder.Services.AddScoped<CurrencyConversionService>();
 builder.Services.AddScoped<ExpenseService>();
+
 
 // Add logging
 builder.Services.AddLogging(logging =>

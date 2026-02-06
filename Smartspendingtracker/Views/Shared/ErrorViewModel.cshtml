@@ -1,0 +1,80 @@
+﻿@model ErrorViewModel
+@{
+    ViewData["Title"] = "Error";
+}
+
+<div class="container mt-5">
+    <div class="row justify-content-center">
+        <div class="col-md-8">
+            <div class="card border-danger">
+                <div class="card-header bg-danger text-white">
+                    <h4 class="mb-0">
+                        <i class="fas fa-exclamation-triangle me-2"></i>
+                        Error Occurred
+                    </h4>
+                </div>
+                <div class="card-body text-center py-5">
+                    <i class="fas fa-exclamation-circle fa-5x text-danger mb-4"></i>
+                    <h2 class="text-danger">Oops! Something went wrong</h2>
+                    <p class="lead text-muted mb-4">
+                        We're sorry, but an error occurred while processing your request.
+                    </p>
+
+                    @if (Model.ShowRequestId)
+                    {
+                        <div class="alert alert-secondary">
+                            <strong>Request ID:</strong> <code>@Model.RequestId</code>
+                            <br />
+                            <small class="text-muted">Please provide this ID if you contact support.</small>
+                        </div>
+                    }
+
+                    <div class="mt-4">
+                        <a asp-controller="Home" asp-action="Index" class="btn btn-primary btn-lg me-2">
+                            <i class="fas fa-home me-2"></i>
+                            Go to Dashboard
+                        </a>
+                        <button onclick="history.back()" class="btn btn-outline-secondary btn-lg">
+                            <i class="fas fa-arrow-left me-2"></i>
+                            Go Back
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <div class="card mt-3">
+                <div class="card-body">
+                    <h6 class="card-title">
+                        <i class="fas fa-question-circle me-2"></i>
+                        What can you do?
+                    </h6>
+                    <ul class="mb-0">
+                        <li>Try refreshing the page</li>
+                        <li>Go back to the <a asp-controller="Home" asp-action="Index">dashboard</a></li>
+                        <li>Check your internet connection</li>
+                        <li>Clear your browser cache and try again</li>
+                    </ul>
+                </div>
+            </div>
+
+            @if (Environment.GetEnvironmentVariable("ASPNETCORE_ENVIRONMENT") == "Development")
+            {
+                <div class="card mt-3 border-warning">
+                    <div class="card-header bg-warning">
+                        <h6 class="mb-0">
+                            <i class="fas fa-code me-2"></i>
+                            Development Mode
+                        </h6>
+                    </div>
+                    <div class="card-body">
+                        <p class="small mb-0">
+                            <strong>Note:</strong> You are seeing this section because the application is running in Development mode.
+                            The Development environment shouldn't be enabled for deployed applications as it can result in displaying
+                            sensitive information to end users.
+                        </p>
+                    </div>
+                </div>
+            }
+        </div>
+    </div>
+</div>

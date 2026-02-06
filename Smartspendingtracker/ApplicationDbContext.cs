@@ -54,6 +54,7 @@ namespace Smartspendingtracker
             SeedData(modelBuilder);
         }
 
+
         private void SeedData(ModelBuilder modelBuilder)
         {
             // Seed Categories
