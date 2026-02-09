@@ -1,6 +1,5 @@
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
-using Smartspendingtracker.Models.ViewModels;
 using SpendingTracker.Models;
 using SpendingTracker.Models.ViewModels;
 
