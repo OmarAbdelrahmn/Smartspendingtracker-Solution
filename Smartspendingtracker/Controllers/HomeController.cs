@@ -1,175 +1,105 @@
 using Microsoft.AspNetCore.Mvc;
-using Smartspendingtracker.Models;
-using SmartSpendingTracker.Services;
+using Microsoft.EntityFrameworkCore;
+using Smartspendingtracker.Models.ViewModels;
+using SpendingTracker.Models;
+using SpendingTracker.Models.ViewModels;
 
-namespace SmartSpendingTracker.Controllers
+namespace SpendingTracker.Controllers
 {
-    /// <summary>
-    /// Main controller for the Smart Spending Tracker application
-    /// </summary>
     public class HomeController : Controller
     {
-        private readonly ExpenseService _expenseService;
-        private readonly ILogger<HomeController> _logger;
+        private readonly ApplicationDbContext _context;
 
-        public HomeController(
-            ExpenseService expenseService,
-            ILogger<HomeController> logger)
+        public HomeController(ApplicationDbContext context)
         {
-            _expenseService = expenseService;
-            _logger = logger;
+            _context = context;
         }
 
-        /// <summary>
-        /// Main dashboard page
-        /// GET: /
-        /// </summary>
         public async Task<IActionResult> Index()
         {
-            var dashboardData = await _expenseService.GetDashboardDataAsync();
-            return View(dashboardData);
-        }
+            var today = DateTime.Now;
+            var firstDayOfMonth = new DateTime(today.Year, today.Month, 1);
 
-        /// <summary>
-        /// Process chat input and create expense
-        /// POST: /Home/ProcessChat
-        /// </summary>
-        [HttpPost]
-        public async Task<IActionResult> ProcessChat([FromBody] ChatInputViewModel model)
-        {
-            if (string.IsNullOrWhiteSpace(model.Message))
-            {
-                return Json(new ChatResponseViewModel
+            // Calculate totals
+            var monthlyIncome = await _context.Transactions
+                .Where(t => t.Date >= firstDayOfMonth && !t.Category.IsExpense)
+                .SumAsync(t => t.Amount);
+
+            var monthlyExpense = await _context.Transactions
+                .Where(t => t.Date >= firstDayOfMonth && t.Category.IsExpense)
+                .SumAsync(t => t.Amount);
+
+            var totalBalance = await _context.Transactions
+                .SumAsync(t => t.Category.IsExpense ? -t.Amount : t.Amount);
+
+            // Get budget for current month
+            var monthlyBudget = await _context.Budgets
+                .Where(b => b.Month == today.Month && b.Year == today.Year && b.CategoryId == null)
+                .Select(b => b.Amount)
+                .FirstOrDefaultAsync();
+
+            var budgetUsedPercentage = monthlyBudget > 0
+                ? (monthlyExpense / monthlyBudget) * 100
+                : 0;
+
+            // Recent transactions
+            var recentTransactions = await _context.Transactions
+                .Include(t => t.Category)
+                .OrderByDescending(t => t.Date)
+                .Take(10)
+                .ToListAsync();
+
+            // Category spending for current month
+            var categorySpendings = await _context.Transactions
+                .Where(t => t.Date >= firstDayOfMonth && t.Category.IsExpense)
+                .GroupBy(t => new { t.Category.Name, t.Category.Color })
+                .Select(g => new CategorySpending
                 {
-                    Success = false,
-                    Message = "Please enter a message"
+                    CategoryName = g.Key.Name,
+                    Amount = g.Sum(t => t.Amount),
+                    Color = g.Key.Color,
+                    Percentage = monthlyExpense > 0 ? (double)(g.Sum(t => t.Amount) / monthlyExpense) * 100 : 0
+                })
+                .OrderByDescending(c => c.Amount)
+                .ToListAsync();
+
+            // Monthly trend (last 6 months)
+            var monthlyTrends = new List<MonthlyTrend>();
+            for (int i = 5; i >= 0; i--)
+            {
+                var month = today.AddMonths(-i);
+                var monthStart = new DateTime(month.Year, month.Month, 1);
+                var monthEnd = monthStart.AddMonths(1).AddDays(-1);
+
+                var income = await _context.Transactions
+                    .Where(t => t.Date >= monthStart && t.Date <= monthEnd && !t.Category.IsExpense)
+                    .SumAsync(t => t.Amount);
+
+                var expense = await _context.Transactions
+                    .Where(t => t.Date >= monthStart && t.Date <= monthEnd && t.Category.IsExpense)
+                    .SumAsync(t => t.Amount);
+
+                monthlyTrends.Add(new MonthlyTrend
+                {
+                    Month = month.ToString("MMM yyyy"),
+                    Income = income,
+                    Expense = expense
                 });
             }
 
-            var (success, message, expense) = await _expenseService.CreateExpenseFromChatAsync(model.Message);
-
-            var response = new ChatResponseViewModel
+            var viewModel = new DashboardViewModel
             {
-                Success = success,
-                Message = message
+                TotalBalance = totalBalance,
+                MonthlyIncome = monthlyIncome,
+                MonthlyExpense = monthlyExpense,
+                MonthlyBudget = monthlyBudget,
+                BudgetUsedPercentage = budgetUsedPercentage,
+                RecentTransactions = recentTransactions,
+                CategorySpendings = categorySpendings,
+                MonthlyTrends = monthlyTrends
             };
 
-            if (success && expense != null)
-            {
-                response.Expense = new ExpenseListItemViewModel
-                {
-                    Id = expense.Id,
-                    Amount = expense.Amount,
-                    Currency = expense.Currency.ToString(),
-                    ConvertedAmountInEGP = expense.ConvertedAmountInEGP,
-                    CategoryName = expense.Category.NameEnglish,
-                    CategoryIcon = expense.Category.IconClass,
-                    CategoryColor = expense.Category.Color,
-                    Description = expense.Description,
-                    DateTime = expense.DateTime,
-                    Source = expense.Source.ToString(),
-                    IsFromChat = true
-                };
-            }
-
-            return Json(response);
-        }
-
-        /// <summary>
-        /// Show create expense form
-        /// GET: /Home/Create
-        /// </summary>
-        public async Task<IActionResult> Create()
-        {
-            ViewBag.Categories = await _expenseService.GetAllCategoriesAsync();
-            return View(new CreateExpenseViewModel());
-        }
-
-        /// <summary>
-        /// Create expense from form
-        /// POST: /Home/Create
-        /// </summary>
-        [HttpPost]
-        [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Create(CreateExpenseViewModel model)
-        {
-            if (!ModelState.IsValid)
-            {
-                ViewBag.Categories = await _expenseService.GetAllCategoriesAsync();
-                return View(model);
-            }
-
-            // Parse currency
-            Currency currency;
-            if (!Enum.TryParse<Currency>(model.Currency, out currency))
-            {
-                currency = Currency.EGP;
-            }
-
-            var (success, message, expense) = await _expenseService.CreateExpenseManuallyAsync(
-                model.Amount,
-                currency,
-                model.CategoryId,
-                model.Description,
-                model.Date
-            );
-
-            if (success)
-            {
-                TempData["SuccessMessage"] = message;
-                return RedirectToAction(nameof(Index));
-            }
-
-            ModelState.AddModelError("", message);
-            ViewBag.Categories = await _expenseService.GetAllCategoriesAsync();
-            return View(model);
-        }
-
-        /// <summary>
-        /// Delete an expense
-        /// POST: /Home/Delete/{id}
-        /// </summary>
-        [HttpPost]
-        public async Task<IActionResult> Delete(int id)
-        {
-            var success = await _expenseService.DeleteExpenseAsync(id);
-
-            if (success)
-            {
-                return Json(new { success = true, message = "Expense deleted successfully" });
-            }
-
-            return Json(new { success = false, message = "Failed to delete expense" });
-        }
-
-        /// <summary>
-        /// Get dashboard data as JSON (for AJAX refresh)
-        /// GET: /Home/GetDashboardData
-        /// </summary>
-        [HttpGet]
-        public async Task<IActionResult> GetDashboardData(int? year, int? month)
-        {
-            DashboardViewModel dashboardData;
-
-            if (year.HasValue && month.HasValue)
-            {
-                dashboardData = await _expenseService.GetDashboardDataAsync(year.Value, month.Value);
-            }
-            else
-            {
-                dashboardData = await _expenseService.GetDashboardDataAsync();
-            }
-
-            return Json(dashboardData);
-        }
-
-        /// <summary>
-        /// Error page
-        /// </summary>
-        [ResponseCache(Duration = 0, Location = ResponseCacheLocation.None, NoStore = true)]
-        public IActionResult Error()
-        {
-            return View();
+            return View(viewModel);
         }
     }
 }

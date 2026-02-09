@@ -1,39 +1,23 @@
 ﻿using System.ComponentModel.DataAnnotations;
 
-namespace Smartspendingtracker.Models;
-
-public class Category
+namespace SpendingTracker.Models
 {
-    [Key]
-    public int Id { get; set; }
+    public class Category
+    {
+        public int Id { get; set; }
 
-    [Required]
-    [MaxLength(100)]
-    public string NameEnglish { get; set; } = string.Empty;
+        [Required]
+        [StringLength(50)]
+        public string Name { get; set; }
 
-    [Required]
-    [MaxLength(100)]
-    public string NameArabic { get; set; } = string.Empty;
+        [StringLength(20)]
+        public string Color { get; set; } = "#3498db";
 
-    /// <summary>
-    /// Keywords for automatic detection (comma-separated, Arabic & English)
-    /// Example: "أكل,مطعم,قهوة,food,restaurant,coffee"
-    /// </summary>
-    [Required]
-    public string Keywords { get; set; } = string.Empty;
+        [StringLength(50)]
+        public string Icon { get; set; } = "fa-tag";
 
-    /// <summary>
-    /// Icon class for UI (e.g., "fa-utensils", "fa-car")
-    /// </summary>
-    [MaxLength(50)]
-    public string IconClass { get; set; } = "fa-folder";
+        public bool IsExpense { get; set; } = true;
 
-    /// <summary>
-    /// Color for charts and UI
-    /// </summary>
-    [MaxLength(20)]
-    public string Color { get; set; } = "#6c757d";
-
-    // Navigation property
-    public ICollection<Expense> Expenses { get; set; } = new List<Expense>();
+        public virtual ICollection<Transaction> Transactions { get; set; }
+    }
 }
