@@ -37,13 +37,13 @@
 </div>
 
 <!-- Summary Card -->
-<div class="card bg-black text-white mb-3 shadow-sm">
+<div class="card bg-dark text-white mb-3 shadow-sm">
     <div class="card-body">
-        <div class="d-flex justify-content-between align-items-center">
+        <div class="d-flex justify-content-between align-items-center flex-wrap">
 
-            <div>
+            <div class="w-100">
                 <div class="small opacity-75">إجمالي المصروفات</div>
-                <h4 class="mb-1">
+                <h4 class="mb-2">
                     @ViewBag.TotalSpent.ToString("N2") ريال
                 </h4>
                 <div class="small">
@@ -61,11 +61,13 @@
     <!-- Chart -->
     <div class="col-12 col-lg-8 mb-3">
         <div class="card shadow-sm">
-            <div class="card-header bg-[#121212]">
+            <div class="card-header bg-dark text-white">
                 <strong>اتجاه المصروف اليومي</strong>
             </div>
-            <div class="card-body">
-                <canvas id="dailyChart" style="height:250px;"></canvas>
+            <div class="card-body p-2 p-md-3">
+                <div style="position: relative; height: 250px; width: 100%;">
+                    <canvas id="dailyChart"></canvas>
+                </div>
             </div>
         </div>
     </div>
@@ -73,7 +75,7 @@
     <!-- Top Locations -->
     <div class="col-12 col-lg-4 mb-3">
         <div class="card shadow-sm">
-            <div class="card-header bg-[#121212]">
+            <div class="card-header bg-dark text-white">
                 <strong>أعلى أماكن الصرف</strong>
             </div>
             <div class="card-body p-2">
@@ -88,15 +90,15 @@
                 @foreach (var location in ViewBag.TopLocations)
                 {
                     <div class="card mb-2 border-0 shadow-sm">
-                        <div class="card-body p-2 d-flex justify-content-between">
-                            <div>
-                                <strong>@location.Location</strong>
+                        <div class="card-body p-2 d-flex justify-content-between align-items-start flex-wrap">
+                            <div class="mb-1 mb-md-0">
+                                <strong class="d-block">@location.Location</strong>
                                 <div class="small text-muted">
                                     @location.Count عملية
                                 </div>
                             </div>
                             <span class="text-danger fw-bold">
-                                @location.Amount.ToString("N2") ريال
+                                @location.Amount.ToString("N2") ریال
                             </span>
                         </div>
                     </div>
@@ -110,9 +112,9 @@
 
 <!-- Transactions List -->
 <div class="card shadow-sm">
-    <div class="card-header bg-[#121212] d-flex justify-content-between">
-        <strong>جميع العمليات</strong>
-        <button class="btn btn-sm btn-outline-primary" onclick="window.print()">
+    <div class="card-header bg-dark text-white d-flex justify-content-between align-items-center flex-wrap">
+        <strong class="mb-2 mb-md-0">جميع العمليات</strong>
+        <button class="btn btn-sm btn-outline-light" onclick="window.print()">
             طباعة
         </button>
     </div>
@@ -120,22 +122,22 @@
     <!-- Desktop Table -->
     <div class="d-none d-md-block">
         <div class="table-responsive">
-            <table class="table table-hover table-dark mb-0">
-                <thead class="bg-light">
+            <table class="table table-hover mb-0">
+                @* <thead class="table-light">
                     <tr>
                         <th>التاريخ</th>
                         <th>الوصف</th>
                         <th class="text-end">المبلغ</th>
                     </tr>
-                </thead>
+                </thead> *@
                 <tbody>
                     @foreach (var t in ViewBag.Transactions)
                     {
                         <tr>
-                            <td>@t.Date.ToString("dd MMM yyyy")</td>
+                            <td>@t.Date.ToString("dd-MM-yyyy")</td>
                             <td>@t.Description</td>
                             <td class="text-end text-danger fw-bold">
-                                @t.Amount.ToString("N2") ريال
+                                @t.Amount.ToString("N2") ریال
                             </td>
                         </tr>
                     }
@@ -147,32 +149,134 @@
     <!-- Mobile Cards -->
     <div class="d-md-none p-2">
 
-        @foreach (var t in ViewBag.Transactions)
-        {
-            <div class="card mb-2 shadow-sm">
-                <div class="card-body p-2">
-
-                    <div class="d-flex justify-content-between">
-                        <strong>@t.Description</strong>
-                        <span class="text-danger fw-bold">
-                            @t.Amount.ToString("N2") ريال
-                        </span>
-                    </div>
-
-                    <div class="small text-muted mt-1">
-                        @t.Date.ToString("dd MMM yyyy")
-                    </div>
-
-                </div>
-            </div>
-        }
-
         @if (ViewBag.Transactions.Count == 0)
         {
             <div class="text-center text-muted py-3">
                 لا توجد عمليات في هذه الفترة
             </div>
         }
+        else
+        {
+            @foreach (var t in ViewBag.Transactions)
+            {
+                <div class="card mb-2 shadow-sm">
+                    <div class="card-body p-2">
+
+                        <div class="d-flex justify-content-between align-items-start mb-2">
+                            <strong class="flex-grow-1 me-2">@t.Description</strong>
+                            <span class="text-danger fw-bold text-nowrap">
+                                @t.Amount.ToString("N2") ریال
+                            </span>
+                        </div>
+
+                        <div class="small text-muted">
+                            @t.Date.ToString("dd-MM-yyyy")
+                        </div>
+
+                    </div>
+                </div>
+            }
+        }
 
     </div>
 </div>
+@section Scripts {
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+    <script>
+        // Configure Chart.js defaults for dark theme
+        Chart.defaults.color = '#e0e0e0';
+        Chart.defaults.borderColor = '#2a2a2a';
+
+        // Daily Spending Trend Line Chart
+        const dailyCtx = document.getElementById('dailyChart').getContext('2d');
+        const dailyChart = new Chart(dailyCtx, {
+            type: 'line',
+            data: {
+                labels: [
+                    @foreach (var day in ViewBag.DailySummary)
+                    {
+                            @Html.Raw($"'{day.Date.ToString("dd/MM")}',")
+                    }
+                ],
+                datasets: [{
+                    label: 'المصروفات اليومية',
+                    data: [
+                        @foreach (var day in ViewBag.DailySummary)
+                        {
+                                @Html.Raw($"{day.Amount},")
+                        }
+                    ],
+                    borderColor: 'rgb(59, 130, 246)',
+                    backgroundColor: 'rgba(59, 130, 246, 0.1)',
+                    borderWidth: 2,
+                    tension: 0.4,
+                    fill: true,
+                    pointRadius: 4,
+                    pointHoverRadius: 6,
+                    pointBackgroundColor: 'rgb(59, 130, 246)',
+                    pointBorderColor: '#fff',
+                    pointBorderWidth: 2
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: {
+                    legend: {
+                        display: true,
+                        position: 'top',
+                        labels: {
+                            color: '#e0e0e0',
+                            font: { size: 12 }
+                        }
+                    },
+                    tooltip: {
+                        backgroundColor: 'rgba(0, 0, 0, 0.8)',
+                        titleColor: '#fff',
+                        bodyColor: '#fff',
+                        borderColor: 'rgb(59, 130, 246)',
+                        borderWidth: 1,
+                        padding: 12,
+                        displayColors: false,
+                        callbacks: {
+                            label: function(context) {
+                                return 'المبلغ: ' + context.parsed.y.toFixed(2) + ' ريال';
+                            }
+                        }
+                    }
+                },
+                scales: {
+                    y: {
+                        beginAtZero: true,
+                        grid: { color: '#2a2a2a' },
+                        ticks: {
+                            color: '#e0e0e0',
+                            callback: function(value) {
+                                return value.toFixed(0) + ' ريال';
+                            }
+                        }
+                    },
+                    x: {
+                        grid: { color: '#2a2a2a' },
+                        ticks: { color: '#e0e0e0' }
+                    }
+                }
+            }
+        });
+    </script>
+}
+<style>
+    /* Fix for mobile chart responsiveness */
+    @@media (max-width: 767px) {
+        #dailyChart {
+            max-height: 200px;
+        }
+    }
+
+    /* Print styles */
+    @@media print {
+        .btn, .card-header button {
+            display: none !important;
+        }
+    }
+</style>

@@ -2,7 +2,6 @@
 @{
     ViewData["Title"] = "إضافة عملية";
 }
-
 <div class="row justify-content-center">
     <div class="col-md-6">
         <div class="card">
@@ -12,20 +11,29 @@
                     إضافة عملية جديدة
                 </h4>
             </div>
-
             <div class="card-body">
                 <form asp-action="Create" method="post">
-
                     <div class="mb-3">
                         <label asp-for="Description" class="form-label">
                             الوصف (أين قمت بالصرف؟)
                         </label>
                         <input asp-for="Description"
                                class="form-control"
-                               placeholder="مثال: مطعم، أمازون، بنده..." />
+                               list="descriptionSuggestions"
+                               placeholder="اختر من القائمة أو اكتب وصف جديد..."
+                               autocomplete="off" />
+                        <datalist id="descriptionSuggestions">
+                            <option value="خبز"></option>
+                            <option value="جلابة"></option>
+                            <option value="بطاطس"></option>
+                            <option value="رز و فراخ"></option>
+                            <option value="سوبر ماركت"></option>
+                        </datalist>
                         <span asp-validation-for="Description" class="text-danger"></span>
+                        <small class="form-text text-muted">
+                            يمكنك اختيار من القائمة أو كتابة وصف جديد
+                        </small>
                     </div>
-
                     <div class="mb-3">
                         <label asp-for="Amount" class="form-label">
                             المبلغ (ريال)
@@ -37,7 +45,6 @@
                                placeholder="0.00" />
                         <span asp-validation-for="Amount" class="text-danger"></span>
                     </div>
-
                     <div class="mb-3">
                         <label asp-for="Date" class="form-label">
                             التاريخ
@@ -47,23 +54,19 @@
                                type="date" />
                         <span asp-validation-for="Date" class="text-danger"></span>
                     </div>
-
                     <div class="d-flex justify-content-between mt-4">
                         <a asp-action="Index" class="btn btn-secondary">
                             إلغاء
                         </a>
-
                         <button type="submit" class="btn btn-primary">
                             حفظ العملية
                         </button>
                     </div>
-
                 </form>
             </div>
         </div>
     </div>
 </div>
-
 @section Scripts {
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery-validate/1.19.5/jquery.validate.min.js"></script>

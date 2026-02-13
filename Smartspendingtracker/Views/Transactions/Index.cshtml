@@ -61,7 +61,7 @@
                     @foreach (var item in Model)
                     {
                         <tr>
-                            <td>@item.Date.ToString("dd MMM yyyy")</td>
+                            <td>@item.Date.ToString("dd-MM-yyyy")</td>
                             <td>@item.Description</td>
                             <td class="text-end text-danger fw-bold">
                                 @item.Amount.ToString("N2") ريال
@@ -113,7 +113,7 @@
                 </div>
 
                 <div class="text-muted small mt-1">
-                    @item.Date.ToString("dd MMM yyyy")
+                    @item.Date.ToString("dd-MM-yyyy")
                 </div>
 
                 <div class="mt-2 d-flex gap-2">
