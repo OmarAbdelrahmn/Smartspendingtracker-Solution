@@ -24,19 +24,18 @@ namespace SpendingTracker.Controllers
                 .AsQueryable();
 
             if (startDate.HasValue)
-                query = query.Where(t => t.Date >= startDate.Value);
+                query = query.Where(t => t.CreatedAt >= startDate.Value);
 
             if (endDate.HasValue)
-                query = query.Where(t => t.Date <= endDate.Value);
+                query = query.Where(t => t.CreatedAt <= endDate.Value);
 
             if (categoryId.HasValue)
                 query = query.Where(t => t.CategoryId == categoryId);
 
-            if (!string.IsNullOrEmpty(search))
-                query = query.Where(t => t.Description.Contains(search) || t.Notes.Contains(search));
+
 
             var transactions = await query
-                .OrderByDescending(t => t.Date)
+                .OrderByDescending(t => t.CreatedAt)
                 .ToListAsync();
 
             ViewBag.Categories = new SelectList(await _context.Categories.ToListAsync(), "Id", "Name");
@@ -60,37 +59,22 @@ namespace SpendingTracker.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Create(TransactionViewModel viewModel)
         {
+            if (viewModel.Date == default)
+                viewModel.Date = DateTime.Now;
+
             if (ModelState.IsValid)
             {
                 var transaction = new Transaction
                 {
                     Description = viewModel.Description,
                     Amount = viewModel.Amount,
-                    Date = viewModel.Date,
                     CategoryId = viewModel.CategoryId,
-                    Notes = viewModel.Notes,
-                    PaymentMethod = viewModel.PaymentMethod,
-                    IsRecurring = viewModel.IsRecurring
+                    CreatedAt = viewModel.Date, // or DateTime.Now
+                    IsRecurring = viewModel.IsRecurring,
+
                 };
 
-                // Handle receipt image upload
-                if (viewModel.ReceiptImage != null && viewModel.ReceiptImage.Length > 0)
-                {
-                    var uploadsFolder = Path.Combine(_environment.WebRootPath, "uploads", "receipts");
-                    Directory.CreateDirectory(uploadsFolder);
-
-                    var uniqueFileName = Guid.NewGuid().ToString() + "_" + viewModel.ReceiptImage.FileName;
-                    var filePath = Path.Combine(uploadsFolder, uniqueFileName);
-
-                    using (var fileStream = new FileStream(filePath, FileMode.Create))
-                    {
-                        await viewModel.ReceiptImage.CopyToAsync(fileStream);
-                    }
-
-                    transaction.ReceiptImagePath = "/uploads/receipts/" + uniqueFileName;
-                }
-
-                _context.Add(transaction);
+                await _context.Transactions.AddAsync(transaction);
                 await _context.SaveChangesAsync();
                 return RedirectToAction(nameof(Index));
             }
@@ -111,11 +95,7 @@ namespace SpendingTracker.Controllers
                 Id = transaction.Id,
                 Description = transaction.Description,
                 Amount = transaction.Amount,
-                Date = transaction.Date,
                 CategoryId = transaction.CategoryId,
-                Notes = transaction.Notes,
-                PaymentMethod = transaction.PaymentMethod,
-                IsRecurring = transaction.IsRecurring,
                 Categories = await GetCategoriesSelectList()
             };
 
@@ -137,37 +117,8 @@ namespace SpendingTracker.Controllers
 
                     transaction.Description = viewModel.Description;
                     transaction.Amount = viewModel.Amount;
-                    transaction.Date = viewModel.Date;
                     transaction.CategoryId = viewModel.CategoryId;
-                    transaction.Notes = viewModel.Notes;
-                    transaction.PaymentMethod = viewModel.PaymentMethod;
                     transaction.IsRecurring = viewModel.IsRecurring;
-
-                    // Handle new receipt image
-                    if (viewModel.ReceiptImage != null && viewModel.ReceiptImage.Length > 0)
-                    {
-                        // Delete old image if exists
-                        if (!string.IsNullOrEmpty(transaction.ReceiptImagePath))
-                        {
-                            var oldPath = Path.Combine(_environment.WebRootPath,
-                                transaction.ReceiptImagePath.TrimStart('/').Replace("/", Path.DirectorySeparatorChar.ToString()));
-                            if (System.IO.File.Exists(oldPath))
-                                System.IO.File.Delete(oldPath);
-                        }
-
-                        var uploadsFolder = Path.Combine(_environment.WebRootPath, "uploads", "receipts");
-                        Directory.CreateDirectory(uploadsFolder);
-
-                        var uniqueFileName = Guid.NewGuid().ToString() + "_" + viewModel.ReceiptImage.FileName;
-                        var filePath = Path.Combine(uploadsFolder, uniqueFileName);
-
-                        using (var fileStream = new FileStream(filePath, FileMode.Create))
-                        {
-                            await viewModel.ReceiptImage.CopyToAsync(fileStream);
-                        }
-
-                        transaction.ReceiptImagePath = "/uploads/receipts/" + uniqueFileName;
-                    }
 
                     _context.Update(transaction);
                     await _context.SaveChangesAsync();
@@ -190,16 +141,7 @@ namespace SpendingTracker.Controllers
         {
             var transaction = await _context.Transactions.FindAsync(id);
             if (transaction != null)
-            {
-                // Delete receipt image if exists
-                if (!string.IsNullOrEmpty(transaction.ReceiptImagePath))
-                {
-                    var path = Path.Combine(_environment.WebRootPath,
-                        transaction.ReceiptImagePath.TrimStart('/').Replace("/", Path.DirectorySeparatorChar.ToString()));
-                    if (System.IO.File.Exists(path))
-                        System.IO.File.Delete(path);
-                }
-
+            {  
                 _context.Transactions.Remove(transaction);
                 await _context.SaveChangesAsync();
             }

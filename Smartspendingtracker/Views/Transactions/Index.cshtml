@@ -56,34 +56,18 @@
                     @foreach (var item in Model)
                     {
                         <tr>
-                            <td>@item.Date.ToString("MMM dd, yyyy")</td>
+                            <td>@item.CreatedAt.ToString("MMM dd, yyyy")</td>
                             <td>
                                 <span class="category-badge" style="background-color: @item.Category.Color; color: #000">
                                     <i class="fas @item.Category.Icon me-1"></i>
                                     @item.Category.Name
                                 </span>
                             </td>
-                            <td>
-                                @item.Description
-                                @if (!string.IsNullOrEmpty(item.Notes))
-                                {
-                                    <i class="fas fa-info-circle text-muted ms-1" title="@item.Notes"></i>
-                                }
-                            </td>
-                            <td>@item.PaymentMethod</td>
-                            <td class="text-end fw-bold @(item.Category.IsExpense ? "text-danger" : "text-success")">
-                                @(item.Category.IsExpense ? "-" : "+")$@item.Amount.ToString("N2")
-                            </td>
+                            
                             <td class="text-center">
                                 <a asp-action="Edit" asp-route-id="@item.Id" class="btn btn-sm btn-outline-primary">
                                     <i class="fas fa-edit"></i>
                                 </a>
-                                @if (!string.IsNullOrEmpty(item.ReceiptImagePath))
-                                {
-                                    <a href="@item.ReceiptImagePath" target="_blank" class="btn btn-sm btn-outline-info">
-                                        <i class="fas fa-image"></i>
-                                    </a>
-                                }
                                 <form asp-action="Delete" asp-route-id="@item.Id" method="post" class="d-inline"
                                       onsubmit="return confirm('Are you sure you want to delete this transaction?');">
                                     <button type="submit" class="btn btn-sm btn-outline-danger">

@@ -30,8 +30,8 @@ namespace SpendingTracker.Controllers
             foreach (var budget in budgets)
             {
                 var spent = await _context.Transactions
-                    .Where(t => t.Date.Month == month && t.Date.Year == year
-                        && (budget.CategoryId == null || t.CategoryId == budget.CategoryId)
+                    .Where(t=>
+                         (budget.CategoryId == null || t.CategoryId == budget.CategoryId)
                         && t.Category.IsExpense)
                     .SumAsync(t => t.Amount);
 

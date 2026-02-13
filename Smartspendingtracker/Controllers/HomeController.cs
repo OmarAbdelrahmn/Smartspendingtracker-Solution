@@ -21,11 +21,11 @@ namespace SpendingTracker.Controllers
 
             // Calculate totals
             var monthlyIncome = await _context.Transactions
-                .Where(t => t.Date >= firstDayOfMonth && !t.Category.IsExpense)
+                .Where(t =>  !t.Category.IsExpense)
                 .SumAsync(t => t.Amount);
 
             var monthlyExpense = await _context.Transactions
-                .Where(t => t.Date >= firstDayOfMonth && t.Category.IsExpense)
+                .Where(t => t.Category.IsExpense)
                 .SumAsync(t => t.Amount);
 
             var totalBalance = await _context.Transactions
@@ -44,13 +44,13 @@ namespace SpendingTracker.Controllers
             // Recent transactions
             var recentTransactions = await _context.Transactions
                 .Include(t => t.Category)
-                .OrderByDescending(t => t.Date)
+                .OrderByDescending(t => t.CreatedAt)
                 .Take(10)
                 .ToListAsync();
 
             // Category spending for current month
             var categorySpendings = await _context.Transactions
-                .Where(t => t.Date >= firstDayOfMonth && t.Category.IsExpense)
+                .Where(t => t.CreatedAt >= firstDayOfMonth && t.Category.IsExpense)
                 .GroupBy(t => new { t.Category.Name, t.Category.Color })
                 .Select(g => new CategorySpending
                 {
@@ -71,11 +71,11 @@ namespace SpendingTracker.Controllers
                 var monthEnd = monthStart.AddMonths(1).AddDays(-1);
 
                 var income = await _context.Transactions
-                    .Where(t => t.Date >= monthStart && t.Date <= monthEnd && !t.Category.IsExpense)
+                    .Where(t => t.CreatedAt >= monthStart && t.CreatedAt <= monthEnd && !t.Category.IsExpense)
                     .SumAsync(t => t.Amount);
 
                 var expense = await _context.Transactions
-                    .Where(t => t.Date >= monthStart && t.Date <= monthEnd && t.Category.IsExpense)
+                    .Where(t => t.CreatedAt >= monthStart && t.CreatedAt <= monthEnd && t.Category.IsExpense)
                     .SumAsync(t => t.Amount);
 
                 monthlyTrends.Add(new MonthlyTrend

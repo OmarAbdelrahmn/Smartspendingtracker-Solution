@@ -131,17 +131,13 @@
                         </div>
                         <div>
                             <div class="font-weight-bold">@transaction.Description</div>
-                            <small class="text-muted">@transaction.Date.ToString("MMM dd, yyyy") • @transaction.PaymentMethod</small>
+                            <small class="text-muted">@transaction.CreatedAt.ToString("MMM dd, yyyy") • </small>
                         </div>
                     </div>
                     <div class="text-end">
                         <div class="font-weight-bold @(transaction.Category.IsExpense ? "text-danger" : "text-success")">
                             @(transaction.Category.IsExpense ? "-" : "+")$@transaction.Amount.ToString("N2")
                         </div>
-                        @if (!string.IsNullOrEmpty(transaction.ReceiptImagePath))
-                        {
-                            <i class="fas fa-paperclip text-muted small"></i>
-                        }
                     </div>
                 </div>
             }

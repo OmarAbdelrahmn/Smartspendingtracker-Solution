@@ -22,13 +22,13 @@ namespace SpendingTracker.Controllers
 
             var query = _context.Transactions
                 .Include(t => t.Category)
-                .Where(t => t.Date >= startDate && t.Date <= endDate)
+                .Where(t => t.CreatedAt >= startDate && t.CreatedAt <= endDate)
                 .AsQueryable();
 
             if (categoryId.HasValue)
                 query = query.Where(t => t.CategoryId == categoryId);
 
-            var transactions = await query.OrderBy(t => t.Date).ToListAsync();
+            var transactions = await query.OrderBy(t => t.CreatedAt).ToListAsync();
 
             var totalIncome = transactions.Where(t => !t.Category.IsExpense).Sum(t => t.Amount);
             var totalExpense = transactions.Where(t => t.Category.IsExpense).Sum(t => t.Amount);
@@ -51,14 +51,13 @@ namespace SpendingTracker.Controllers
 
             // Daily summaries
             var dailySummaries = transactions
-                .GroupBy(t => t.Date.Date)
+                .GroupBy(t => t.CreatedAt)
                 .Select(g => new DailySummary
                 {
                     Date = g.Key,
                     Income = g.Where(t => !t.Category.IsExpense).Sum(t => t.Amount),
                     Expense = g.Where(t => t.Category.IsExpense).Sum(t => t.Amount)
                 })
-                .OrderBy(d => d.Date)
                 .ToList();
 
             var viewModel = new ReportViewModel
@@ -94,11 +93,11 @@ namespace SpendingTracker.Controllers
                 var endDate = startDate.AddMonths(1).AddDays(-1);
 
                 var income = await _context.Transactions
-                    .Where(t => t.Date >= startDate && t.Date <= endDate && !t.Category.IsExpense)
+                    .Where(t => t.CreatedAt >= startDate && t.CreatedAt <= endDate && !t.Category.IsExpense)
                     .SumAsync(t => t.Amount);
 
                 var expense = await _context.Transactions
-                    .Where(t => t.Date >= startDate && t.Date <= endDate && t.Category.IsExpense)
+                    .Where(t => t.CreatedAt >= startDate && t.CreatedAt <= endDate && t.Category.IsExpense)
                     .SumAsync(t => t.Amount);
 
                 monthlyData.Add(new
