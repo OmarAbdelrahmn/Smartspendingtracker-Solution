@@ -1,146 +1,69 @@
-﻿@model SpendingTracker.Models.ViewModels.DashboardViewModel
-@{
-    ViewData["Title"] = "Dashboard";
+﻿@{
+    ViewData["Title"] = "لوحة التحكم";
 }
 
 <div class="d-flex justify-content-between align-items-center mb-4">
-    <h2 class="mb-0">Dashboard</h2>
-    <span class="text-muted">@DateTime.Now.ToString("MMMM dd, yyyy")</span>
+    <h2>لوحة التحكم</h2>
+    <span class="text-muted">@DateTime.Now.ToString("dd MMMM yyyy")</span>
 </div>
 
-<!-- Stats Cards -->
+<!-- بطاقات الإحصائيات -->
 <div class="row mb-4">
-    <div class="col-xl-3 col-md-6 mb-4">
-        <div class="card card-stats border-primary shadow h-100 py-2">
+    <div class="col-md-6 mb-4">
+        <div class="card stat-card">
             <div class="card-body">
-                <div class="row no-gutters align-items-center">
-                    <div class="col mr-2">
-                        <div class="text-xs font-weight-bold text-primary text-uppercase mb-1">Total Balance</div>
-                        <div class="h5 mb-0 font-weight-bold text-gray-800">$@Model.TotalBalance.ToString("N2")</div>
-                    </div>
-                    <div class="col-auto">
-                        <i class="fas fa-wallet fa-2x text-gray-300 text-primary opacity-25"></i>
-                    </div>
-                </div>
+                <h6 class="text-uppercase text-muted mb-2">إجمالي المصروفات</h6>
+                <h2 class="text-primary mb-0">@ViewBag.TotalSpent.ToString("N2") ريال</h2>
             </div>
         </div>
     </div>
-
-    <div class="col-xl-3 col-md-6 mb-4">
-        <div class="card card-stats border-success shadow h-100 py-2">
+    <div class="col-md-6 mb-4">
+        <div class="card stat-card">
             <div class="card-body">
-                <div class="row no-gutters align-items-center">
-                    <div class="col mr-2">
-                        <div class="text-xs font-weight-bold text-success text-uppercase mb-1">Monthly Income</div>
-                        <div class="h5 mb-0 font-weight-bold text-gray-800">$@Model.MonthlyIncome.ToString("N2")</div>
-                    </div>
-                    <div class="col-auto">
-                        <i class="fas fa-arrow-up fa-2x text-gray-300 text-success opacity-25"></i>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </div>
-
-    <div class="col-xl-3 col-md-6 mb-4">
-        <div class="card card-stats border-danger shadow h-100 py-2">
-            <div class="card-body">
-                <div class="row no-gutters align-items-center">
-                    <div class="col mr-2">
-                        <div class="text-xs font-weight-bold text-danger text-uppercase mb-1">Monthly Expense</div>
-                        <div class="h5 mb-0 font-weight-bold text-gray-800">$@Model.MonthlyExpense.ToString("N2")</div>
-                    </div>
-                    <div class="col-auto">
-                        <i class="fas fa-arrow-down fa-2x text-gray-300 text-danger opacity-25"></i>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </div>
-
-    <div class="col-xl-3 col-md-6 mb-4">
-        <div class="card card-stats border-warning shadow h-100 py-2">
-            <div class="card-body">
-                <div class="row no-gutters align-items-center">
-                    <div class="col mr-2">
-                        <div class="text-xs font-weight-bold text-warning text-uppercase mb-1">Budget Used</div>
-                        <div class="row no-gutters align-items-center">
-                            <div class="col-auto">
-                                <div class="h5 mb-0 mr-3 font-weight-bold text-gray-800">@Model.BudgetUsedPercentage.ToString("N1")%</div>
-                            </div>
-                            <div class="col">
-                                <div class="progress progress-sm mr-2">
-                                    <div class="progress-bar bg-warning" role="progressbar" style="width: @Model.BudgetUsedPercentage%"></div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="col-auto">
-                        <i class="fas fa-chart-pie fa-2x text-gray-300 text-warning opacity-25"></i>
-                    </div>
-                </div>
+                <h6 class="text-uppercase text-muted mb-2">مصروفات هذا الشهر</h6>
+                <h2 class="text-primary mb-0">@ViewBag.MonthlySpent.ToString("N2") ريال</h2>
             </div>
         </div>
     </div>
 </div>
 
-<div class="row">
-    <!-- Charts -->
-    <div class="col-lg-8 mb-4">
-        <div class="card shadow mb-4">
-            <div class="card-header py-3 d-flex justify-content-between align-items-center bg-white">
-                <h6 class="m-0 font-weight-bold text-primary">Monthly Trends</h6>
-            </div>
-            <div class="card-body">
-                <div class="chart-container">
-                    <canvas id="trendChart"></canvas>
-                </div>
-            </div>
-        </div>
-    </div>
-
-    <div class="col-lg-4 mb-4">
-        <div class="card shadow mb-4">
-            <div class="card-header py-3 bg-white">
-                <h6 class="m-0 font-weight-bold text-primary">Spending by Category</h6>
-            </div>
-            <div class="card-body">
-                <div class="chart-container">
-                    <canvas id="categoryChart"></canvas>
-                </div>
-            </div>
-        </div>
-    </div>
-</div>
-
-<!-- Recent Transactions -->
-<div class="card shadow mb-4">
-    <div class="card-header py-3 d-flex justify-content-between align-items-center bg-white">
-        <h6 class="m-0 font-weight-bold text-primary">Recent Transactions</h6>
-        <a asp-controller="Transactions" asp-action="Index" class="btn btn-sm btn-primary">View All</a>
+<!-- آخر العمليات -->
+<div class="card">
+    <div class="card-header bg-white d-flex justify-content-between align-items-center">
+        <h5 class="mb-0">أحدث العمليات</h5>
+        <a asp-controller="Transactions" asp-action="Index" class="btn btn-sm btn-primary">عرض الكل</a>
     </div>
     <div class="card-body p-0">
-        <div class="list-group list-group-flush">
-            @foreach (var transaction in Model.RecentTransactions)
-            {
-                <div class="list-group-item transaction-item d-flex justify-content-between align-items-center">
-                    <div class="d-flex align-items-center">
-                        <div class="category-badge me-3" style="background-color: @transaction.Category.Color; color: @transaction.Category.Color">
-                            <i class="fas @transaction.Category.Icon"></i>
-                            @transaction.Category.Name
-                        </div>
-                        <div>
-                            <div class="font-weight-bold">@transaction.Description</div>
-                            <small class="text-muted">@transaction.CreatedAt.ToString("MMM dd, yyyy") • </small>
-                        </div>
-                    </div>
-                    <div class="text-end">
-                        <div class="font-weight-bold @(transaction.Category.IsExpense ? "text-danger" : "text-success")">
-                            @(transaction.Category.IsExpense ? "-" : "+")$@transaction.Amount.ToString("N2")
-                        </div>
-                    </div>
-                </div>
-            }
+        <div class="table-responsive">
+            <table class="table table-hover mb-0">
+                <thead class="bg-light">
+                    <tr>
+                        <th>التاريخ</th>
+                        <th>الوصف</th>
+                        <th class="text-end">المبلغ</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (var transaction in ViewBag.RecentTransactions)
+                    {
+                        <tr>
+                            <td>@transaction.Date.ToString("dd MMM yyyy")</td>
+                            <td>@transaction.Description</td>
+                            <td class="text-end text-danger">
+                                @transaction.Amount.ToString("N2") ريال
+                            </td>
+                        </tr>
+                    }
+                    @if (ViewBag.RecentTransactions.Count == 0)
+                    {
+                        <tr>
+                            <td colspan="3" class="text-center text-muted py-4">
+                                لا توجد عمليات حتى الآن
+                            </td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
         </div>
     </div>
 </div>
@@ -148,78 +71,3 @@
 <a asp-controller="Transactions" asp-action="Create" class="btn btn-primary btn-floating">
     <i class="fas fa-plus"></i>
 </a>
-
-@section Scripts {
-    <script>
-        // Trend Chart
-        const trendCtx = document.getElementById('trendChart').getContext('2d');
-        new Chart(trendCtx, {
-            type: 'line',
-            data: {
-                labels: @Html.Raw(Json.Serialize(Model.MonthlyTrends.Select(m => m.Month))),
-                datasets: [{
-                    label: 'Income',
-                    data: @Html.Raw(Json.Serialize(Model.MonthlyTrends.Select(m => m.Income))),
-                    borderColor: '#1cc88a',
-                    backgroundColor: 'rgba(28, 200, 138, 0.1)',
-                    tension: 0.4,
-                    fill: true
-                }, {
-                    label: 'Expense',
-                    data: @Html.Raw(Json.Serialize(Model.MonthlyTrends.Select(m => m.Expense))),
-                    borderColor: '#e74a3b',
-                    backgroundColor: 'rgba(231, 74, 59, 0.1)',
-                    tension: 0.4,
-                    fill: true
-                }]
-            },
-            options: {
-                responsive: true,
-                maintainAspectRatio: false,
-                plugins: {
-                    legend: {
-                        position: 'top',
-                    }
-                },
-                scales: {
-                    y: {
-                        beginAtZero: true,
-                        ticks: {
-                            callback: function(value) {
-                                return '$' + value.toLocaleString();
-                            }
-                        }
-                    }
-                }
-            }
-        });
-
-        // Category Chart
-        const categoryCtx = document.getElementById('categoryChart').getContext('2d');
-        new Chart(categoryCtx, {
-            type: 'doughnut',
-            data: {
-                labels: @Html.Raw(Json.Serialize(Model.CategorySpendings.Select(c => c.CategoryName))),
-                datasets: [{
-                    data: @Html.Raw(Json.Serialize(Model.CategorySpendings.Select(c => c.Amount))),
-                    backgroundColor: @Html.Raw(Json.Serialize(Model.CategorySpendings.Select(c => c.Color))),
-                    borderWidth: 2,
-                    borderColor: '#fff'
-                }]
-            },
-            options: {
-                responsive: true,
-                maintainAspectRatio: false,
-                plugins: {
-                    legend: {
-                        position: 'bottom',
-                        labels: {
-                            boxWidth: 12,
-                            padding: 10
-                        }
-                    }
-                }
-            }
-        });
-    </script>
-}

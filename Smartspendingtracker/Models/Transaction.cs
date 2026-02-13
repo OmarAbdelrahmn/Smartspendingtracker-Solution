@@ -9,17 +9,13 @@ namespace SpendingTracker.Models
 
         [Required]
         [StringLength(200)]
-        public string Description { get; set; }
+        public string Description { get; set; } // Where money was spent
 
         [Required]
         [Column(TypeName = "decimal(18,2)")]
         public decimal Amount { get; set; }
 
-        public int? CategoryId { get; set; }
-        public virtual Category? Category { get; set; }
-
-        public bool IsRecurring { get; set; }
-
-        public DateTime CreatedAt { get; set; } = DateTime.Now;
+        [Required]
+        public DateTime Date { get; set; } = DateTime.Now;
     }
 }
