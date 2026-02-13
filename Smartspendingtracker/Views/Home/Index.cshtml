@@ -4,7 +4,7 @@
 
 <div class="d-flex justify-content-between align-items-center mb-4">
     <h2>لوحة التحكم</h2>
-    <span class="text-muted">@DateTime.Now.ToString("dd MMMM yyyy")</span>
+    <span class="text-muted">@DateTime.Now.ToString("dd-MM-yyyy")</span>
 </div>
 
 <!-- بطاقات الإحصائيات -->
@@ -29,7 +29,7 @@
 
 <!-- آخر العمليات -->
 <div class="card">
-    <div class="card-header bg-white d-flex justify-content-between align-items-center">
+    <div class="card-header bg-[#121212] d-flex justify-content-between align-items-center">
         <h5 class="mb-0">أحدث العمليات</h5>
         <a asp-controller="Transactions" asp-action="Index" class="btn btn-sm btn-primary">عرض الكل</a>
     </div>
@@ -47,7 +47,7 @@
                     @foreach (var transaction in ViewBag.RecentTransactions)
                     {
                         <tr>
-                            <td>@transaction.Date.ToString("dd MMM yyyy")</td>
+                            <td>@transaction.Date.ToString("dd-MM-yyyy")</td>
                             <td>@transaction.Description</td>
                             <td class="text-end text-danger">
                                 @transaction.Amount.ToString("N2") ريال
@@ -68,6 +68,7 @@
     </div>
 </div>
 
-<a asp-controller="Transactions" asp-action="Create" class="btn btn-primary btn-floating">
-    <i class="fas fa-plus"></i>
+<a asp-controller="Transactions" asp-action="Create"
+   class="btn btn-primary w-100 py-3 d-flex justify-content-center align-items-center mt-5">
+    <i class="fas fa-plus me-2"></i> إضافة عملية جديدة
 </a>

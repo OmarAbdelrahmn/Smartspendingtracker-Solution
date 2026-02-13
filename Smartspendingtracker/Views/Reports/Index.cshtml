@@ -2,47 +2,54 @@
     ViewData["Title"] = "تقارير المصروفات";
 }
 
-<h2 class="mb-4">تقارير المصروفات</h2>
+<h4 class="mb-3">تقارير المصروفات</h4>
 
-<!-- الفلاتر -->
-<div class="card mb-4">
+<!-- Filters -->
+<div class="card mb-3">
     <div class="card-body">
-        <form method="get" class="row g-3 align-items-end">
-            <div class="col-md-4">
-                <label class="form-label">من تاريخ</label>
-                <input type="date" name="startDate" class="form-control"
+        <form method="get" class="row g-2">
+
+            <div class="col-12 col-md-4">
+                <label class="form-label small">من تاريخ</label>
+                <input type="date"
+                       name="startDate"
+                       class="form-control form-control-sm"
                        value="@ViewBag.StartDate.ToString("yyyy-MM-dd")" />
             </div>
-            <div class="col-md-4">
-                <label class="form-label">إلى تاريخ</label>
-                <input type="date" name="endDate" class="form-control"
+
+            <div class="col-12 col-md-4">
+                <label class="form-label small">إلى تاريخ</label>
+                <input type="date"
+                       name="endDate"
+                       class="form-control form-control-sm"
                        value="@ViewBag.EndDate.ToString("yyyy-MM-dd")" />
             </div>
-            <div class="col-md-4">
-                <button type="submit" class="btn btn-primary w-100">
-                    <i class="fas fa-chart-bar me-2"></i>عرض التقرير
+
+            <div class="col-12 col-md-4 d-flex align-items-end">
+                <button type="submit"
+                        class="btn btn-primary w-100 btn-sm">
+                    عرض التقرير
                 </button>
             </div>
+
         </form>
     </div>
 </div>
 
-<!-- بطاقة الملخص -->
-<div class="row mb-4">
-    <div class="col-12">
-        <div class="card bg-danger text-white">
-            <div class="card-body">
-                <div class="d-flex justify-content-between align-items-center">
-                    <div>
-                        <h6 class="text-uppercase">إجمالي المصروفات</h6>
-                        <h2>@ViewBag.TotalSpent.ToString("N2") ريال</h2>
-                        <small>
-                            @ViewBag.StartDate.ToString("dd MMM yyyy")
-                            -
-                            @ViewBag.EndDate.ToString("dd MMM yyyy")
-                        </small>
-                    </div>
-                    <i class="fas fa-money-bill-wave fa-4x opacity-50"></i>
+<!-- Summary Card -->
+<div class="card bg-black text-white mb-3 shadow-sm">
+    <div class="card-body">
+        <div class="d-flex justify-content-between align-items-center">
+
+            <div>
+                <div class="small opacity-75">إجمالي المصروفات</div>
+                <h4 class="mb-1">
+                    @ViewBag.TotalSpent.ToString("N2") ريال
+                </h4>
+                <div class="small">
+                    @ViewBag.StartDate.ToString("dd-MM-yyyy")
+                    -
+                    @ViewBag.EndDate.ToString("dd-MM-yyyy")
                 </div>
             </div>
         </div>
@@ -50,68 +57,74 @@
 </div>
 
 <div class="row">
-    <!-- مخطط المصروفات اليومية -->
-    <div class="col-lg-8 mb-4">
-        <div class="card">
-            <div class="card-header bg-white">
-                <h5 class="mb-0">اتجاه المصروفات اليومية</h5>
+
+    <!-- Chart -->
+    <div class="col-12 col-lg-8 mb-3">
+        <div class="card shadow-sm">
+            <div class="card-header bg-[#121212]">
+                <strong>اتجاه المصروف اليومي</strong>
             </div>
             <div class="card-body">
-                <canvas id="dailyChart" style="height: 300px;"></canvas>
+                <canvas id="dailyChart" style="height:250px;"></canvas>
             </div>
         </div>
     </div>
 
-    <!-- أعلى أماكن الصرف -->
-    <div class="col-lg-4 mb-4">
-        <div class="card">
-            <div class="card-header bg-white">
-                <h5 class="mb-0">أعلى أماكن الصرف</h5>
+    <!-- Top Locations -->
+    <div class="col-12 col-lg-4 mb-3">
+        <div class="card shadow-sm">
+            <div class="card-header bg-[#121212]">
+                <strong>أعلى أماكن الصرف</strong>
             </div>
-            <div class="card-body p-0">
-                <div class="list-group list-group-flush">
-                    @foreach (var location in ViewBag.TopLocations)
-                    {
-                        <div class="list-group-item d-flex justify-content-between align-items-center">
+            <div class="card-body p-2">
+
+                @if (ViewBag.TopLocations.Count == 0)
+                {
+                    <div class="text-center text-muted py-3">
+                        لا توجد بيانات
+                    </div>
+                }
+
+                @foreach (var location in ViewBag.TopLocations)
+                {
+                    <div class="card mb-2 border-0 shadow-sm">
+                        <div class="card-body p-2 d-flex justify-content-between">
                             <div>
                                 <strong>@location.Location</strong>
-                                <br />
-                                <small class="text-muted">
+                                <div class="small text-muted">
                                     @location.Count عملية
-                                </small>
+                                </div>
                             </div>
-                            <span class="badge bg-danger rounded-pill">
+                            <span class="text-danger fw-bold">
                                 @location.Amount.ToString("N2") ريال
                             </span>
                         </div>
-                    }
-                    @if (ViewBag.TopLocations.Count == 0)
-                    {
-                        <div class="list-group-item text-center text-muted">
-                            لا توجد بيانات متاحة
-                        </div>
-                    }
-                </div>
+                    </div>
+                }
+
             </div>
         </div>
     </div>
+
 </div>
 
-<!-- قائمة العمليات -->
-<div class="card">
-    <div class="card-header bg-white d-flex justify-content-between align-items-center">
-        <h5 class="mb-0">جميع العمليات</h5>
+<!-- Transactions List -->
+<div class="card shadow-sm">
+    <div class="card-header bg-[#121212] d-flex justify-content-between">
+        <strong>جميع العمليات</strong>
         <button class="btn btn-sm btn-outline-primary" onclick="window.print()">
-            <i class="fas fa-print me-2"></i>طباعة
+            طباعة
         </button>
     </div>
-    <div class="card-body p-0">
+
+    <!-- Desktop Table -->
+    <div class="d-none d-md-block">
         <div class="table-responsive">
-            <table class="table table-hover mb-0">
+            <table class="table table-hover table-dark mb-0">
                 <thead class="bg-light">
                     <tr>
                         <th>التاريخ</th>
-                        <th>الوصف (المكان)</th>
+                        <th>الوصف</th>
                         <th class="text-end">المبلغ</th>
                     </tr>
                 </thead>
@@ -126,70 +139,40 @@
                             </td>
                         </tr>
                     }
-                    @if (ViewBag.Transactions.Count == 0)
-                    {
-                        <tr>
-                            <td colspan="3" class="text-center text-muted py-4">
-                                لا توجد عمليات في هذه الفترة
-                            </td>
-                        </tr>
-                    }
                 </tbody>
-                <tfoot class="bg-light">
-                    <tr>
-                        <th colspan="2" class="text-end">الإجمالي:</th>
-                        <th class="text-end text-danger">
-                            @ViewBag.TotalSpent.ToString("N2") ريال
-                        </th>
-                    </tr>
-                </tfoot>
             </table>
         </div>
     </div>
+
+    <!-- Mobile Cards -->
+    <div class="d-md-none p-2">
+
+        @foreach (var t in ViewBag.Transactions)
+        {
+            <div class="card mb-2 shadow-sm">
+                <div class="card-body p-2">
+
+                    <div class="d-flex justify-content-between">
+                        <strong>@t.Description</strong>
+                        <span class="text-danger fw-bold">
+                            @t.Amount.ToString("N2") ريال
+                        </span>
+                    </div>
+
+                    <div class="small text-muted mt-1">
+                        @t.Date.ToString("dd MMM yyyy")
+                    </div>
+
+                </div>
+            </div>
+        }
+
+        @if (ViewBag.Transactions.Count == 0)
+        {
+            <div class="text-center text-muted py-3">
+                لا توجد عمليات في هذه الفترة
+            </div>
+        }
+
+    </div>
 </div>
-
-@section Scripts {
-    <script>
-        const dailyData = @Html.Raw(Json.Serialize(ViewBag.DailySummary));
-
-        new Chart(document.getElementById('dailyChart'), {
-            type: 'bar',
-            data: {
-                labels: dailyData.map(d => new Date(d.date).toLocaleDateString('ar-SA')),
-                datasets: [{
-                    label: 'المصروف اليومي',
-                    data: dailyData.map(d => d.amount),
-                    backgroundColor: '#e74a3b',
-                    borderColor: '#e74a3b',
-                    borderWidth: 1
-                }]
-            },
-            options: {
-                responsive: true,
-                maintainAspectRatio: false,
-                scales: {
-                    y: {
-                        beginAtZero: true,
-                        ticks: {
-                            callback: function(value) {
-                                return value.toFixed(2) + ' ريال';
-                            }
-                        }
-                    }
-                },
-                plugins: {
-                    legend: {
-                        display: false
-                    },
-                    tooltip: {
-                        callbacks: {
-                            label: function(context) {
-                                return context.parsed.y.toFixed(2) + ' ريال';
-                            }
-                        }
-                    }
-                }
-            }
-        });
-    </script>
-}
