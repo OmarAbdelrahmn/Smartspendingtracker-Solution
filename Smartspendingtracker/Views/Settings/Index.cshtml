@@ -1,0 +1,176 @@
+﻿@model Smartspendingtracker.Models.UserSettings
+@{
+    ViewData["Title"] = "الإعدادات";
+}
+
+<div class="row justify-content-center">
+    <div class="col-md-8">
+
+        @if (TempData["SuccessMessage"] != null)
+        {
+            <div class="alert alert-success alert-dismissible fade show" role="alert">
+                <i class="fas fa-check-circle ms-2"></i>
+                @TempData["SuccessMessage"]
+                <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+            </div>
+        }
+
+        <div class="card">
+            <div class="card-header bg-primary text-white">
+                <h4 class="mb-0">
+                    <i class="fas fa-cog ms-2"></i>
+                    إعدادات العملة
+                </h4>
+            </div>
+
+            <div class="card-body">
+                <form asp-action="Update" method="post">
+                    <input type="hidden" asp-for="Id" />
+                    <input type="hidden" asp-for="LastModified" />
+
+                    <!-- Currency Selection -->
+                    <div class="mb-4">
+                        <label class="form-label fw-bold">
+                            <i class="fas fa-money-bill-wave ms-2"></i>
+                            العملة المفضلة للعرض
+                        </label>
+
+                        <div class="btn-group w-100" role="group">
+                            <input type="radio"
+                                   class="btn-check"
+                                   name="PreferredCurrency"
+                                   id="currencySAR"
+                                   value="SAR"
+                                   checked="@(Model.PreferredCurrency == "SAR")" />
+                            <label class="btn btn-outline-primary" for="currencySAR">
+                                <i class="fas fa-coins ms-1"></i>
+                                ريال سعودي (SAR)
+                            </label>
+
+                            <input type="radio"
+                                   class="btn-check"
+                                   name="PreferredCurrency"
+                                   id="currencyEGP"
+                                   value="EGP"
+                                   checked="@(Model.PreferredCurrency == "EGP")" />
+                            <label class="btn btn-outline-primary" for="currencyEGP">
+                                <i class="fas fa-coins ms-1"></i>
+                                جنيه مصري (EGP)
+                            </label>
+                        </div>
+
+                        <small class="form-text text-muted d-block mt-2">
+                            <i class="fas fa-info-circle ms-1"></i>
+                            ملاحظة: يتم حفظ جميع العمليات بالريال السعودي، وسيتم عرض المبالغ بالعملة المختارة
+                        </small>
+                    </div>
+
+                    <!-- Exchange Rate -->
+                    <div class="mb-4" id="exchangeRateSection">
+                        <label asp-for="ExchangeRate" class="form-label fw-bold">
+                            <i class="fas fa-exchange-alt ms-2"></i>
+                            سعر الصرف
+                        </label>
+
+                        <div class="input-group">
+                            <span class="input-group-text">1 ريال سعودي =</span>
+                            <input asp-for="ExchangeRate"
+                                   class="form-control"
+                                   type="number"
+                                   step="0.0001"
+                                   min="0.01"
+                                   placeholder="13.5" />
+                            <span class="input-group-text">جنيه مصري</span>
+                        </div>
+
+                        <span asp-validation-for="ExchangeRate" class="text-danger"></span>
+
+                        <small class="form-text text-muted d-block mt-2">
+                            <i class="fas fa-info-circle ms-1"></i>
+                            السعر الحالي تقريباً: 1 SAR = 13.5 EGP (يمكنك تعديله حسب السعر الفعلي)
+                        </small>
+                    </div>
+
+                    <!-- Preview -->
+                    <div class="alert alert-info" id="previewSection">
+                        <h6 class="alert-heading">
+                            <i class="fas fa-eye ms-2"></i>
+                            معاينة
+                        </h6>
+                        <p class="mb-0">
+                            مثال: 100 ريال سعودي =
+                            <strong id="previewAmount">1,350.00</strong> جنيه مصري
+                        </p>
+                    </div>
+
+                    <!-- Buttons -->
+                    <div class="d-flex justify-content-between mt-4">
+                        <a asp-controller="Home" asp-action="Index" class="btn btn-secondary">
+                            <i class="fas fa-arrow-right ms-1"></i>
+                            رجوع
+                        </a>
+
+                        <button type="submit" class="btn btn-primary">
+                            <i class="fas fa-save ms-1"></i>
+                            حفظ الإعدادات
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+
+        <!-- Info Card -->
+        <div class="card mt-3 border-info">
+            <div class="card-body">
+                <h6 class="card-title">
+                    <i class="fas fa-question-circle ms-2 text-info"></i>
+                    كيفية استخدام الإعدادات
+                </h6>
+                <ul class="mb-0">
+                    <li>اختر العملة التي تفضل رؤية المبالغ بها</li>
+                    <li>قم بتعديل سعر الصرف ليطابق السعر الحالي</li>
+                    <li>جميع العمليات تُحفظ بالريال السعودي</li>
+                    <li>العرض فقط سيتغير حسب اختيارك</li>
+                </ul>
+            </div>
+        </div>
+
+    </div>
+</div>
+
+@section Scripts {
+    <script>
+        // Show/hide exchange rate section based on currency selection
+        function toggleExchangeRate() {
+            const egpRadio = document.getElementById('currencyEGP');
+            const exchangeSection = document.getElementById('exchangeRateSection');
+            const previewSection = document.getElementById('previewSection');
+
+            if (egpRadio.checked) {
+                exchangeSection.style.display = 'block';
+                previewSection.style.display = 'block';
+            } else {
+                exchangeSection.style.display = 'none';
+                previewSection.style.display = 'none';
+            }
+        }
+
+        // Update preview
+        function updatePreview() {
+            const rate = parseFloat(document.querySelector('input[name="ExchangeRate"]').value) || 0;
+            const preview = (100 * rate).toFixed(2);
+            document.getElementById('previewAmount').textContent = preview.toLocaleString('ar-EG');
+        }
+
+        // Event listeners
+        document.querySelectorAll('input[name="PreferredCurrency"]').forEach(radio => {
+            radio.addEventListener('change', toggleExchangeRate);
+        });
+
+        document.querySelector('input[name="ExchangeRate"]').addEventListener('input', updatePreview);
+
+        // Initialize on load
+        toggleExchangeRate();
+        updatePreview();
+    </script>
+}

@@ -1,4 +1,5 @@
 ﻿using Microsoft.EntityFrameworkCore;
+using Smartspendingtracker.Models;
 
 namespace SpendingTracker.Models
 {
@@ -8,5 +9,6 @@ namespace SpendingTracker.Models
             : base(options) { }
 
         public DbSet<Transaction> Transactions { get; set; }
+        public DbSet<UserSettings> UserSettings { get; set; }
     }
 }

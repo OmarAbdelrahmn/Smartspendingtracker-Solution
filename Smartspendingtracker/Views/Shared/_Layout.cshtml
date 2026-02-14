@@ -71,27 +71,63 @@
                 border-bottom: 1px solid #2a2a2a;
             }
 
+        /* Mobile Bottom Navigation */
+        .navbar.fixed-bottom {
+            z-index: 1030;
+        }
+
+        /* Wider Mobile Sidebar */
+        .offcanvas-mobile {
+            width: 80% !important;
+            max-width: 320px;
+        }
+
+            .offcanvas-mobile .nav-link {
+                font-size: 1.1rem;
+                display: flex;
+                align-items: center;
+            }
+
+                .offcanvas-mobile .nav-link.active {
+                    background-color: rgba(59, 130, 246, 0.2);
+                    border-right: 4px solid #3b82f6;
+                }
+
+        /* Add padding to body for fixed bottom nav */
+        @media (max-width: 767px) {
+            body {
+                padding-bottom: 65px;
+            }
+        }
+
+        /* Improve touch target size */
+        .nav-link i {
+            min-width: 30px;
+        }
+
     </style>
 </head>
 
 <body>
 
-    <!-- 🔥 Mobile Navbar -->
-    <nav class="navbar navbar-dark bg-dark shadow-sm d-md-none px-3">
-        <button class="btn" type="button" data-bs-toggle="offcanvas" data-bs-target="#mobileMenu">
-            <i class="fas fa-bars fa-lg"></i>
+    <!-- 🔥 Improved Mobile Navbar - Fixed at Bottom -->
+    <nav class="navbar navbar-dark bg-dark shadow-sm d-md-none fixed-bottom px-3 py-2">
+        <button class="btn btn-link text-white p-0" type="button" data-bs-toggle="offcanvas" data-bs-target="#mobileMenu">
+            <i class="fas fa-bars fa-2x"></i>
         </button>
 
-        <span class="fw-bold">
+        <span class="fw-bold flex-grow-1 text-center">
             <i class="fas fa-wallet ms-1"></i>
             متتبع المصروفات
         </span>
-    </nav>
 
+        <a asp-controller="Settings" asp-action="Index" class="btn btn-link text-white p-0">
+            <i class="fas fa-cog fa-2x"></i>
+        </a>
+    </nav>
 
     <div class="container-fluid">
         <div class="row">
-
             <!-- 💻 Desktop Sidebar -->
             <div class="col-md-2 sidebar p-0 d-none d-md-block">
                 <div class="p-4 text-center">
@@ -116,34 +152,48 @@
                        asp-controller="Reports" asp-action="Index">
                         <i class="fas fa-chart-bar"></i> التقارير
                     </a>
+
+                    <a class="nav-link @(ViewContext.RouteData.Values["Controller"]?.ToString() == "Settings" ? "active" : "")"
+                       asp-controller="Settings" asp-action="Index">
+                        <i class="fas fa-cog"></i> الإعدادات
+                    </a>
                 </nav>
             </div>
 
-            <!-- 📱 Mobile Offcanvas Menu -->
-            <div class="offcanvas offcanvas-start text-bg-dark" tabindex="-1" id="mobileMenu">
-                <div class="offcanvas-header">
+            <!-- 📱 Mobile Offcanvas Menu - Wider and with swipe -->
+            <div class="offcanvas offcanvas-start text-bg-dark offcanvas-mobile" tabindex="-1" id="mobileMenu">
+                <div class="offcanvas-header border-bottom">
                     <h5 class="offcanvas-title">
                         <i class="fas fa-wallet ms-2"></i>
                         متتبع المصروفات
                     </h5>
-                    <button type="button" class="btn-close" data-bs-dismiss="offcanvas"></button>
+                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="offcanvas"></button>
                 </div>
 
                 <div class="offcanvas-body p-0">
                     <nav class="nav flex-column">
-                        <a class="nav-link p-3 border-bottom"
+                        <a class="nav-link p-3 border-bottom @(ViewContext.RouteData.Values["Controller"]?.ToString() == "Home" ? "active" : "")"
                            asp-controller="Home" asp-action="Index">
-                            <i class="fas fa-home ms-2"></i> لوحة التحكم
+                            <i class="fas fa-home ms-2 fa-lg"></i>
+                            <span class="me-2">لوحة التحكم</span>
                         </a>
 
-                        <a class="nav-link p-3 border-bottom"
+                        <a class="nav-link p-3 border-bottom @(ViewContext.RouteData.Values["Controller"]?.ToString() == "Transactions" ? "active" : "")"
                            asp-controller="Transactions" asp-action="Index">
-                            <i class="fas fa-list ms-2"></i> العمليات
+                            <i class="fas fa-list ms-2 fa-lg"></i>
+                            <span class="me-2">العمليات</span>
                         </a>
 
-                        <a class="nav-link p-3"
+                        <a class="nav-link p-3 border-bottom @(ViewContext.RouteData.Values["Controller"]?.ToString() == "Reports" ? "active" : "")"
                            asp-controller="Reports" asp-action="Index">
-                            <i class="fas fa-chart-bar ms-2"></i> التقارير
+                            <i class="fas fa-chart-bar ms-2 fa-lg"></i>
+                            <span class="me-2">التقارير</span>
+                        </a>
+
+                        <a class="nav-link p-3 @(ViewContext.RouteData.Values["Controller"]?.ToString() == "Settings" ? "active" : "")"
+                           asp-controller="Settings" asp-action="Index">
+                            <i class="fas fa-cog ms-2 fa-lg"></i>
+                            <span class="me-2">الإعدادات</span>
                         </a>
                     </nav>
                 </div>
