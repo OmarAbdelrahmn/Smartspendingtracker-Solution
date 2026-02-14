@@ -15,6 +15,9 @@ namespace SpendingTracker.Controllers
 
         public async Task<IActionResult> Index(DateTime? startDate, DateTime? endDate)
         {
+            // ✅ ADD THIS at the beginning
+            var settings = await _context.UserSettings.FirstOrDefaultAsync();
+
             var today = DateTime.Now;
             startDate ??= new DateTime(today.Year, today.Month, 1);
             endDate ??= today;
@@ -51,6 +54,8 @@ namespace SpendingTracker.Controllers
                 .Take(10)
                 .ToList();
 
+            // ✅ ADD THIS
+            ViewBag.Settings = settings;
             ViewBag.StartDate = startDate.Value;
             ViewBag.EndDate = endDate.Value;
             ViewBag.TotalSpent = totalSpent;

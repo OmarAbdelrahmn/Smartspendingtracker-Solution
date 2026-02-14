@@ -15,6 +15,9 @@ namespace SpendingTracker.Controllers
 
         public async Task<IActionResult> Index(DateTime? startDate, DateTime? endDate, string search)
         {
+            // ✅ ADD THIS at the beginning
+            var settings = await _context.UserSettings.FirstOrDefaultAsync();
+
             var query = _context.Transactions.AsQueryable();
 
             if (startDate.HasValue)
@@ -30,6 +33,8 @@ namespace SpendingTracker.Controllers
                 .OrderByDescending(t => t.Date)
                 .ToListAsync();
 
+            // ✅ ADD THIS
+            ViewBag.Settings = settings;
             ViewBag.StartDate = startDate?.ToString("yyyy-MM-dd");
             ViewBag.EndDate = endDate?.ToString("yyyy-MM-dd");
             ViewBag.Search = search;

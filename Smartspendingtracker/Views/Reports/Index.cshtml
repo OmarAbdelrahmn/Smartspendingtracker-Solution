@@ -1,5 +1,7 @@
-﻿@{
+﻿@using SpendingTracker.Helpers
+@{
     ViewData["Title"] = "تقارير المصروفات";
+    var settings = ViewBag.Settings as Smartspendingtracker.Models.UserSettings;
 }
 
 <h4 class="mb-3">تقارير المصروفات</h4>
@@ -44,7 +46,7 @@
             <div class="w-100">
                 <div class="small opacity-75">إجمالي المصروفات</div>
                 <h4 class="mb-2">
-                    @ViewBag.TotalSpent.ToString("N2") ريال
+                    @CurrencyHelper.FormatAmount(ViewBag.TotalSpent, settings)
                 </h4>
                 <div class="small">
                     @ViewBag.StartDate.ToString("dd-MM-yyyy")
@@ -98,7 +100,7 @@
                                 </div>
                             </div>
                             <span class="text-danger fw-bold">
-                                @location.Amount.ToString("N2") ریال
+                                @CurrencyHelper.FormatAmount(location.Amount, settings)
                             </span>
                         </div>
                     </div>
@@ -137,7 +139,7 @@
                             <td>@t.Date.ToString("dd-MM-yyyy")</td>
                             <td>@t.Description</td>
                             <td class="text-end text-danger fw-bold">
-                                @t.Amount.ToString("N2") ریال
+                                @CurrencyHelper.FormatAmount(t.Amount, settings)
                             </td>
                         </tr>
                     }

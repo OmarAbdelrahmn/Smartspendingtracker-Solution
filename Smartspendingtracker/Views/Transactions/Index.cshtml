@@ -1,6 +1,9 @@
 ﻿@model IEnumerable<SpendingTracker.Models.Transaction>
+@using SpendingTracker.Helpers
 @{
     ViewData["Title"] = "العمليات";
+    var settings = ViewBag.Settings as Smartspendingtracker.Models.UserSettings;
+
 }
 
 <div class="d-flex justify-content-between align-items-center mb-3">
@@ -64,8 +67,9 @@
                             <td>@item.Date.ToString("dd-MM-yyyy")</td>
                             <td>@item.Description</td>
                             <td class="text-end text-danger fw-bold">
-                                @item.Amount.ToString("N2") ريال
+                                @CurrencyHelper.FormatAmount(item.Amount, settings)
                             </td>
+
                             <td class="text-center">
                                 <a asp-action="Edit" asp-route-id="@item.Id"
                                    class="btn btn-sm btn-outline-primary">
@@ -108,7 +112,7 @@
                 <div class="d-flex justify-content-between">
                     <strong>@item.Description</strong>
                     <span class="text-danger fw-bold">
-                        @item.Amount.ToString("N2") ريال
+                        @CurrencyHelper.FormatAmount(item.Amount, settings)
                     </span>
                 </div>
 
