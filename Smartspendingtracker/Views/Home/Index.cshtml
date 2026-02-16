@@ -1,78 +1,118 @@
 ﻿@using SpendingTracker.Helpers
-
 @{
     ViewData["Title"] = "لوحة التحكم";
-
     var settings = ViewBag.Settings as Smartspendingtracker.Models.UserSettings;
 }
 
-<div class="d-flex justify-content-between align-items-center mb-4">
-    <h2>لوحة التحكم</h2>
-    <span class="text-muted">@DateTime.Now.ToString("dd-MM-yyyy")</span>
+<!-- Header Section -->
+<div class="mb-3">
+    <h4 class="mb-1">مرحباً بك 👋</h4>
+    <p class="text-muted small mb-0">@DateTime.Now.ToString("dddd، dd MMMM yyyy", new System.Globalization.CultureInfo("ar-SA"))</p>
 </div>
 
-<!-- بطاقات الإحصائيات -->
-<div class="row mb-4">
-    <div class="col-md-6 mb-4">
-        <div class="card stat-card">
-            <div class="card-body">
-                <h6 class="text-uppercase text-muted mb-2">إجمالي المصروفات</h6>
-                <h2 class="text-primary mb-0">@CurrencyHelper.FormatAmount(ViewBag.TotalSpent, settings)</h2>
+<!-- Stats Cards -->
+<div class="row g-3 mb-4">
+    <div class="col-12">
+        <div class="card bg-gradient-primary text-white border-0 shadow-sm">
+            <div class="card-body p-3">
+                <div class="d-flex justify-content-between align-items-start">
+                    <div>
+                        <p class="mb-1 opacity-75 small">إجمالي المصروفات</p>
+                        <h3 class="mb-0">@CurrencyHelper.FormatAmount(ViewBag.TotalSpent, settings)</h3>
+                    </div>
+                    <div class="bg-white bg-opacity-25 rounded-circle p-2">
+                        <i class="fas fa-wallet fa-lg"></i>
+                    </div>
+                </div>
             </div>
         </div>
     </div>
-    <div class="col-md-6 mb-4">
-        <div class="card stat-card">
-            <div class="card-body">
-                <h6 class="text-uppercase text-muted mb-2">مصروفات هذا الشهر</h6>
-                <h2 class="text-primary mb-0">@CurrencyHelper.FormatAmount(ViewBag.MonthlySpent, settings)</h2>
+
+    <div class="col-12">
+        <div class="card border-0 shadow-sm">
+            <div class="card-body p-3">
+                <div class="d-flex justify-content-between align-items-start">
+                    <div>
+                        <p class="mb-1 text-muted small">مصروفات هذا الشهر</p>
+                        <h4 class="mb-0">@CurrencyHelper.FormatAmount(ViewBag.MonthlySpent, settings)</h4>
+                    </div>
+                    <div class="bg-primary bg-opacity-10 rounded-circle p-2">
+                        <i class="fas fa-calendar-alt text-primary fa-lg"></i>
+                    </div>
+                </div>
             </div>
         </div>
     </div>
 </div>
 
-<!-- آخر العمليات -->
-<div class="card">
-    <div class="card-header bg-[#121212] d-flex justify-content-between align-items-center">
-        <h5 class="mb-0">أحدث العمليات</h5>
-        <a asp-controller="Transactions" asp-action="Index" class="btn btn-sm btn-primary">عرض الكل</a>
-    </div>
-    <div class="card-body p-0">
-        <div class="table-responsive">
-            <table class="table table-hover mb-0">
-                <thead class="bg-light">
-                    <tr>
-                        <th>التاريخ</th>
-                        <th>الوصف</th>
-                        <th class="text-end">المبلغ</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    @foreach (var transaction in ViewBag.RecentTransactions)
-                    {
-                        <tr>
-                            <td>@transaction.Date.ToString("dd-MM-yyyy")</td>
-                            <td>@transaction.Description</td>
-                            <td class="text-end text-danger">
-                            @CurrencyHelper.FormatAmount(transaction.Amount, settings)
-                            </td>
-                        </tr>
-                    }
-                    @if (ViewBag.RecentTransactions.Count == 0)
-                    {
-                        <tr>
-                            <td colspan="3" class="text-center text-muted py-4">
-                                لا توجد عمليات حتى الآن
-                            </td>
-                        </tr>
-                    }
-                </tbody>
-            </table>
+<!-- Quick Actions -->
+<div class="mb-4">
+    <h6 class="mb-3">إجراءات سريعة</h6>
+    <div class="row g-2">
+        <div class="col-6">
+            <a asp-controller="Transactions" asp-action="Create" class="btn btn-primary w-100 py-3 d-flex flex-column align-items-center">
+                <i class="fas fa-plus-circle fa-2x mb-2"></i>
+                <span>إضافة عملية</span>
+            </a>
+        </div>
+        <div class="col-6">
+            <a asp-controller="Reports" asp-action="Index" class="btn btn-outline-primary w-100 py-3 d-flex flex-column align-items-center">
+                <i class="fas fa-chart-line fa-2x mb-2"></i>
+                <span>عرض التقارير</span>
+            </a>
         </div>
     </div>
 </div>
 
-<a asp-controller="Transactions" asp-action="Create"
-   class="btn btn-primary w-100 py-3 d-flex justify-content-center align-items-center mt-5">
-    <i class="fas fa-plus me-2"></i> إضافة عملية جديدة
-</a>
+<!-- Recent Transactions -->
+<div class="mb-3">
+    <div class="d-flex justify-content-between align-items-center mb-3">
+        <h6 class="mb-0">أحدث العمليات</h6>
+        <a asp-controller="Transactions" asp-action="Index" class="btn btn-sm btn-link text-decoration-none">
+            عرض الكل <i class="fas fa-chevron-left ms-1"></i>
+        </a>
+    </div>
+
+    @if (ViewBag.RecentTransactions.Count == 0)
+    {
+        <div class="card border-0 shadow-sm">
+            <div class="card-body text-center py-5">
+                <i class="fas fa-inbox fa-3x text-muted mb-3"></i>
+                <p class="text-muted mb-0">لا توجد عمليات حتى الآن</p>
+                <a asp-controller="Transactions" asp-action="Create" class="btn btn-primary btn-sm mt-3">
+                    إضافة أول عملية
+                </a>
+            </div>
+        </div>
+    }
+    else
+    {
+        @foreach (var transaction in ViewBag.RecentTransactions)
+        {
+            <div class="card border-0 shadow-sm mb-2">
+                <div class="card-body p-3">
+                    <div class="d-flex justify-content-between align-items-start">
+                        <div class="d-flex align-items-start">
+                            <div class="bg-danger bg-opacity-10 rounded-circle p-2 me-3">
+                                <i class="fas fa-arrow-down text-danger"></i>
+                            </div>
+                            <div>
+                                <h6 class="mb-1">@transaction.Description</h6>
+                                <small class="text-muted">@transaction.Date.ToString("dd MMM yyyy", new System.Globalization.CultureInfo("ar-SA"))</small>
+                            </div>
+                        </div>
+                        <div class="text-end">
+                            <h6 class="mb-0 text-danger">@CurrencyHelper.FormatAmount(transaction.Amount, settings)</h6>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        }
+    }
+</div>
+
+<style>
+    .bg-gradient-primary {
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    }
+</style>

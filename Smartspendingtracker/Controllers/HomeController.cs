@@ -30,7 +30,7 @@ namespace SpendingTracker.Controllers
             // Recent transactions
             var recentTransactions = await _context.Transactions
                 .OrderByDescending(t => t.Date)
-                .Take(10)
+                .Take(5)
                 .ToListAsync();
 
             // ✅ ADD THIS - Pass settings to view

@@ -2,74 +2,85 @@
 @{
     ViewData["Title"] = "إضافة عملية";
 }
-<div class="row justify-content-center">
-    <div class="col-md-6">
-        <div class="card">
-            <div class="card-header bg-primary text-white">
-                <h4 class="mb-0">
-                    <i class="fas fa-plus-circle ms-2"></i>
-                    إضافة عملية جديدة
-                </h4>
+
+<div class="mb-3">
+    <a asp-action="Index" class="btn btn-link text-decoration-none p-0">
+        <i class="fas fa-arrow-right ms-1"></i>
+        رجوع
+    </a>
+</div>
+
+<div class="card border-0 shadow-sm">
+    <div class="card-header bg-primary text-white border-0 p-3">
+        <h5 class="mb-0">
+            <i class="fas fa-plus-circle ms-2"></i>
+            إضافة عملية جديدة
+        </h5>
+    </div>
+
+    <div class="card-body p-3">
+        <form asp-action="Create" method="post">
+            <div class="mb-3">
+                <label asp-for="Description" class="form-label fw-bold">
+                    <i class="fas fa-tag ms-1"></i>
+                    الوصف
+                </label>
+                <input asp-for="Description"
+                       class="form-control form-control-lg"
+                       list="descriptionSuggestions"
+                       placeholder="مثال: سوبر ماركت، مطعم..."
+                       autocomplete="off" />
+                <datalist id="descriptionSuggestions">
+                    <option value="خبز"></option>
+                    <option value="جلابة"></option>
+                    <option value="بطاطس"></option>
+                    <option value="رز و فراخ"></option>
+                    <option value="سوبر ماركت"></option>
+                    <option value="مطعم"></option>
+                    <option value="مواصلات"></option>
+                    <option value="كهرباء"></option>
+                </datalist>
+                <span asp-validation-for="Description" class="text-danger"></span>
             </div>
-            <div class="card-body">
-                <form asp-action="Create" method="post">
-                    <div class="mb-3">
-                        <label asp-for="Description" class="form-label">
-                            الوصف (أين قمت بالصرف؟)
-                        </label>
-                        <input asp-for="Description"
-                               class="form-control"
-                               list="descriptionSuggestions"
-                               placeholder="اختر من القائمة أو اكتب وصف جديد..."
-                               autocomplete="off" />
-                        <datalist id="descriptionSuggestions">
-                            <option value="خبز"></option>
-                            <option value="جلابة"></option>
-                            <option value="بطاطس"></option>
-                            <option value="رز و فراخ"></option>
-                            <option value="سوبر ماركت"></option>
-                        </datalist>
-                        <span asp-validation-for="Description" class="text-danger"></span>
-                        <small class="form-text text-muted">
-                            يمكنك اختيار من القائمة أو كتابة وصف جديد
-                        </small>
-                    </div>
-                    <div class="mb-3">
-                        <label asp-for="Amount" class="form-label">
-                            المبلغ (ريال)
-                        </label>
-                        <input asp-for="Amount"
-                               class="form-control"
-                               type="number"
-                               step="0.01"
-                               placeholder="0.00" 
-                               value ="" />
-                        <span asp-validation-for="Amount" class="text-danger"></span>
-                    </div>
-                    <div class="mb-3">
-                        <label asp-for="Date" class="form-label">
-                            التاريخ
-                        </label>
-                        <input asp-for="Date"
-                               class="form-control"
-                               type="date" />
-                        <span asp-validation-for="Date" class="text-danger"></span>
-                    </div>
-                    <div class="d-flex justify-content-between mt-4">
-                        <a asp-action="Index" class="btn btn-secondary">
-                            إلغاء
-                        </a>
-                        <button type="submit" class="btn btn-primary">
-                            حفظ العملية
-                        </button>
-                    </div>
-                </form>
+
+            <div class="mb-3">
+                <label asp-for="Amount" class="form-label fw-bold">
+                    <i class="fas fa-money-bill-wave ms-1"></i>
+                    المبلغ (ريال)
+                </label>
+                <input asp-for="Amount"
+                       class="form-control form-control-lg text-end"
+                       type="number"
+                       step="0.01"
+                       placeholder="0.00"
+                       value="" />
+                <span asp-validation-for="Amount" class="text-danger"></span>
             </div>
-        </div>
+
+            <div class="mb-4">
+                <label asp-for="Date" class="form-label fw-bold">
+                    <i class="fas fa-calendar-alt ms-1"></i>
+                    التاريخ
+                </label>
+                <input asp-for="Date"
+                       class="form-control form-control-lg"
+                       type="date" />
+                <span asp-validation-for="Date" class="text-danger"></span>
+            </div>
+
+            <div class="d-grid gap-2">
+                <button type="submit" class="btn btn-primary btn-lg">
+                    <i class="fas fa-save ms-1"></i>
+                    حفظ العملية
+                </button>
+                <a asp-action="Index" class="btn btn-outline-secondary">
+                    إلغاء
+                </a>
+            </div>
+        </form>
     </div>
 </div>
+
 @section Scripts {
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery-validate/1.19.5/jquery.validate.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery-validation-unobtrusive/4.0.0/jquery.validation.unobtrusive.min.js"></script>
+    @await Html.PartialAsync("_ValidationScriptsPartial")
 }

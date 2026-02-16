@@ -29,6 +29,9 @@ namespace SpendingTracker.Controllers
 
             var totalSpent = transactions.Sum(t => t.Amount);
 
+            var recordedDays = transactions.Select(t => t.Date.Date).Distinct().Count();
+            var averagePerDay = recordedDays > 0 ? totalSpent / recordedDays : 0;
+
             // Daily summary
             var dailySummary = transactions
                 .GroupBy(t => t.Date.Date)
@@ -61,6 +64,7 @@ namespace SpendingTracker.Controllers
             ViewBag.TotalSpent = totalSpent;
             ViewBag.DailySummary = dailySummary;
             ViewBag.TopLocations = topLocations;
+            ViewBag.AveragePerDay = averagePerDay;  // ✅ ADD THIS LINE
             ViewBag.Transactions = transactions;
 
             return View();
