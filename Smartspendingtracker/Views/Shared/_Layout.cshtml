@@ -13,62 +13,17 @@
     <link rel="manifest" href="/manifest.json" />
     <link rel="apple-touch-icon" href="/icons/icon-192x192.png" />
 
-    <!-- Favicon -->
-    <link rel="icon" type="image/x-icon" href="~/favicon.ico">
-    <link rel="icon" type="image/png" sizes="16x16" href="~/favicon-16x16.png">
-    <link rel="icon" type="image/png" sizes="32x32" href="~/favicon-32x32.png">
-
-    <!-- Meta Description -->
-    <meta name="description" content="@(ViewData["Description"] ?? "متتبع المصروفات الذكي - تطبيق ويب سهل لإدارة وتتبع مصروفاتك اليومية والشهرية بشكل احترافي")">
-    <meta name="keywords" content="متتبع المصروفات, إدارة المال, تتبع النفقات, ميزانية, مصروفات">
-    <meta name="author" content="متتبع المصروفات">
-
-    <!-- Open Graph -->
-    <meta property="og:type" content="website">
-    <meta property="og:url" content="@(ViewData["OgUrl"] ?? "https://moneyspending.runasp.net/")">
-    <meta property="og:title" content="@(ViewData["OgTitle"] ?? ViewData["Title"] + " - متتبع المصروفات")">
-    <meta property="og:description" content="@(ViewData["OgDescription"] ?? "متتبع المصروفات الذكي - تطبيق ويب سهل لإدارة وتتبع مصروفاتك اليومية والشهرية")">
-    <meta property="og:image" content="@(ViewData["OgImage"] ?? "~/icons/icon-512x512.png")">
-    <meta property="og:locale" content="ar_SA">
-
-    <!-- Twitter -->
-    <meta name="twitter:card" content="summary_large_image">
-    <meta name="twitter:url" content="@(ViewData["OgUrl"] ?? "https://moneyspending.runasp.net/")">
-    <meta name="twitter:title" content="@(ViewData["OgTitle"] ?? ViewData["Title"] + " - متتبع المصروفات")">
-    <meta name="twitter:description" content="@(ViewData["OgDescription"] ?? "متتبع المصروفات الذكي - تطبيق ويب سهل لإدارة وتتبع مصروفاتك اليومية والشهرية")">
-    <meta name="twitter:image" content="@(ViewData["OgImage"] ?? "~/icons/icon-512x512.png")">
-
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.rtl.min.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 
     <style>
-        /* ========== PWA & MOBILE FIXES ========== */
-        * {
-            -webkit-tap-highlight-color: transparent;
-        }
-
-        html, body {
-            margin: 0;
-            padding: 0;
-            width: 100%;
-            overflow-x: hidden;
-        }
-
         body {
             background-color: #121212;
             color: #e0e0e0;
-            min-height: 100vh;
+            padding-bottom: 80px;
         }
 
-        /* PWA Safe Areas */
-        @@supports (padding: max(0px)) {
-            body {
-                padding-left: max(0px, env(safe-area-inset-left));
-                padding-right: max(0px, env(safe-area-inset-right));
-            }
-        }
-
-        /* ========== DESKTOP SIDEBAR ========== */
+        /* Desktop Sidebar */
         .sidebar {
             min-height: 100vh;
             background-color: #1c1c1c;
@@ -76,14 +31,12 @@
             position: fixed;
             top: 0;
             right: 0;
-            width: 16.666667%;
-            overflow-y: auto;
+            width: 250px;
         }
 
             .sidebar .nav-link {
                 color: #ccc;
                 padding: 1rem;
-                transition: all 0.3s;
             }
 
                 .sidebar .nav-link:hover,
@@ -96,14 +49,14 @@
                     margin-left: 10px;
                 }
 
-        /* ========== DESKTOP MAIN CONTENT ========== */
-        .main-content-desktop {
-            margin-right: 16.666667%;
+        /* Desktop Content */
+        .main-content {
+            margin-right: 250px;
             padding: 2rem;
         }
 
-        /* ========== CARDS & TABLES ========== */
-        .card, .table {
+        /* Cards */
+        .card {
             background-color: #1e1e1e;
             color: #e0e0e0;
             border: 1px solid #2a2a2a;
@@ -114,327 +67,255 @@
             border-bottom: 1px solid #2a2a2a;
         }
 
-        /* ========== MOBILE STYLES ========== */
-        @@media (max-width: 767px) {
-            /* Hide desktop sidebar */
-            .sidebar {
-                display: none !important;
-            }
+        /* Mobile Bottom Nav */
+        .mobile-bottom-nav {
+            display: none;
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            background-color: #1c1c1c;
+            border-top: 1px solid #2a2a2a;
+            z-index: 1030;
+            padding: 0.5rem 0;
+        }
 
-            .main-content-desktop {
-                display: none !important;
-            }
-            /* Mobile container */
-            .mobile-container {
-                display: block !important;
-                padding-top: 60px;
-                padding-bottom: 70px;
-                padding-left: 1rem;
-                padding-right: 1rem;
-            }
-            /* PWA standalone mode - add extra top padding */
-            @@media (display-mode: standalone) {
-                .mobile-container {
-                    padding-top: calc(60px + env(safe-area-inset-top, 0px));
-                }
-
-                .mobile-header {
-                    padding-top: calc(0.75rem + env(safe-area-inset-top, 0px)) !important;
-                }
-
-                .mobile-bottom-nav {
-                    padding-bottom: calc(0.5rem + env(safe-area-inset-bottom, 0px)) !important;
-                }
-            }
-            /* Mobile header - fixed at top */
-            .mobile-header {
-                position: fixed;
-                top: 0;
-                left: 0;
-                right: 0;
-                background-color: #1c1c1c;
-                border-bottom: 1px solid #2a2a2a;
-                z-index: 1030;
-                padding: 0.75rem 1rem;
-                display: flex;
-                align-items: center;
-                justify-content: space-between;
-            }
-
-                .mobile-header h5 {
-                    margin: 0;
-                    font-size: 1.1rem;
-                }
-            /* Mobile bottom navigation */
-            .mobile-bottom-nav {
-                position: fixed;
-                bottom: 0;
-                left: 0;
-                right: 0;
-                background-color: #1c1c1c;
-                border-top: 1px solid #2a2a2a;
-                z-index: 1030;
-                display: flex;
-                justify-content: space-around;
-                padding: 0.5rem 0;
-            }
-
-                .mobile-bottom-nav a {
-                    flex: 1;
-                    text-align: center;
-                    color: #ccc;
-                    text-decoration: none;
-                    padding: 0.5rem;
-                    transition: all 0.3s;
-                }
-
-                    .mobile-bottom-nav a.active {
-                        color: #3b82f6;
-                    }
-
-                    .mobile-bottom-nav a i {
-                        display: block;
-                        font-size: 1.3rem;
-                        margin-bottom: 0.25rem;
-                    }
-
-                    .mobile-bottom-nav a span {
-                        display: block;
-                        font-size: 0.75rem;
-                    }
-            /* Offcanvas improvements */
-            .offcanvas {
-                background-color: #1c1c1c;
-                width: 85% !important;
-                max-width: 350px;
-            }
-
-            .offcanvas-header {
-                border-bottom: 1px solid #2a2a2a;
-                padding: 1.5rem 1rem;
-            }
-
-            .offcanvas-body {
-                padding: 0;
-            }
-
-            .offcanvas .nav-link {
-                padding: 1rem 1.5rem;
-                border-bottom: 1px solid #2a2a2a;
-                display: flex;
-                align-items: center;
+            .mobile-bottom-nav a {
+                flex: 1;
+                text-align: center;
                 color: #ccc;
+                text-decoration: none;
+                padding: 0.5rem;
             }
 
-                .offcanvas .nav-link.active {
-                    background-color: rgba(59, 130, 246, 0.2);
+                .mobile-bottom-nav a.active {
                     color: #3b82f6;
-                    border-right: 4px solid #3b82f6;
                 }
 
-                .offcanvas .nav-link i {
-                    margin-left: 1rem;
-                    font-size: 1.2rem;
-                    width: 25px;
+                .mobile-bottom-nav a i {
+                    display: block;
+                    font-size: 1.3rem;
+                    margin-bottom: 0.25rem;
                 }
+
+                .mobile-bottom-nav a span {
+                    display: block;
+                    font-size: 0.7rem;
+                }
+
+        /* Mobile Header */
+        .mobile-header {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            background-color: #1c1c1c;
+            border-bottom: 1px solid #2a2a2a;
+            z-index: 1029;
+            padding: 0.75rem 1rem;
         }
 
-        /* ========== DESKTOP ONLY ========== */
-        @@media (min-width: 768px) {
-            .mobile-header,
-            .mobile-bottom-nav,
-            .mobile-container {
-                display: none !important;
-            }
-        }
-
-        /* Mobile Optimizations */
+        /* Mobile Styles */
         @@media (max-width: 767px) {
+            .sidebar {
+                display: none;
+            }
+
+            .main-content {
+                margin-right: 0;
+                padding: 1rem;
+                padding-top: 70px;
+                padding-bottom: 90px;
+            }
+
+            .mobile-header {
+                display: flex;
+                justify-content: space-between;
+                align-items: center;
+            }
+
+            .mobile-bottom-nav {
+                display: flex;
+            }
+
             .card {
                 border-radius: 12px;
+                margin-bottom: 1rem;
             }
 
             .btn {
                 border-radius: 8px;
             }
+            /* PWA Standalone Mode */
+            @@supports (padding: max(0px)) {
+                .mobile-header {
+                    padding-top: max(0.75rem, env(safe-area-inset-top));
+                }
 
-            .form-control {
-                border-radius: 8px;
-            }
+                .mobile-bottom-nav {
+                    padding-bottom: max(0.5rem, env(safe-area-inset-bottom));
+                }
 
-            h4 {
-                font-size: 1.3rem;
-            }
-
-            h5 {
-                font-size: 1.1rem;
-            }
-
-            h6 {
-                font-size: 0.95rem;
-            }
-
-            .card-body {
-                padding: 1rem;
-            }
-
-            .shadow-sm {
-                box-shadow: 0 2px 8px rgba(0,0,0,0.1) !important;
+                .main-content {
+                    padding-top: calc(70px + env(safe-area-inset-top));
+                    padding-bottom: calc(90px + env(safe-area-inset-bottom));
+                }
             }
         }
 
-        /* Smooth transitions */
-        .card, .btn {
-            transition: all 0.3s ease;
+        /* Offcanvas */
+        .offcanvas {
+            background-color: #1c1c1c;
+            width: 280px !important;
         }
 
-            .card:active {
-                transform: scale(0.98);
+        .offcanvas-header {
+            border-bottom: 1px solid #2a2a2a;
+        }
+
+        .offcanvas .nav-link {
+            padding: 1rem 1.5rem;
+            border-bottom: 1px solid #2a2a2a;
+            color: #ccc;
+        }
+
+            .offcanvas .nav-link.active {
+                background-color: rgba(59, 130, 246, 0.2);
+                color: #3b82f6;
+                border-right: 4px solid #3b82f6;
             }
 
-            .btn:active {
-                transform: scale(0.95);
+            .offcanvas .nav-link i {
+                margin-left: 1rem;
+                width: 25px;
             }
+
+        /* Gradient */
+        .bg-gradient-primary {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        }
     </style>
 </head>
 
 <body>
-    <!-- DESKTOP LAYOUT -->
-    <div class="d-none d-md-block">
-        <div class="container-fluid">
-            <div class="row">
-                <!-- Desktop Sidebar -->
-                <div class="col-md-2 sidebar p-0">
-                    <div class="p-4 text-center">
-                        <h5>
-                            <i class="fas fa-wallet ms-2"></i>
-                            متتبع المصروفات
-                        </h5>
-                    </div>
+    <!-- Desktop Sidebar -->
+    <div class="sidebar d-none d-md-block">
+        <div class="p-4 text-center border-bottom">
+            <h5>
+                <i class="fas fa-wallet ms-2"></i>
+                متتبع المصروفات
+            </h5>
+        </div>
 
-                    <nav class="nav flex-column">
-                        <a class="nav-link @(ViewContext.RouteData.Values["Controller"]?.ToString() == "Home" ? "active" : "")"
-                           asp-controller="Home" asp-action="Index">
-                            <i class="fas fa-home"></i> لوحة التحكم
-                        </a>
+        <nav class="nav flex-column">
+            <a class="nav-link @(ViewContext.RouteData.Values["Controller"]?.ToString() == "Home" ? "active" : "")"
+               asp-controller="Home" asp-action="Index">
+                <i class="fas fa-home"></i> لوحة التحكم
+            </a>
 
-                        <a class="nav-link @(ViewContext.RouteData.Values["Controller"]?.ToString() == "Transactions" ? "active" : "")"
-                           asp-controller="Transactions" asp-action="Index">
-                            <i class="fas fa-list"></i> العمليات
-                        </a>
+            <a class="nav-link @(ViewContext.RouteData.Values["Controller"]?.ToString() == "Transactions" ? "active" : "")"
+               asp-controller="Transactions" asp-action="Index">
+                <i class="fas fa-list"></i> العمليات
+            </a>
 
-                        <a class="nav-link @(ViewContext.RouteData.Values["Controller"]?.ToString() == "Reports" ? "active" : "")"
-                           asp-controller="Reports" asp-action="Index">
-                            <i class="fas fa-chart-bar"></i> التقارير
-                        </a>
+            <a class="nav-link @(ViewContext.RouteData.Values["Controller"]?.ToString() == "Reports" ? "active" : "")"
+               asp-controller="Reports" asp-action="Index">
+                <i class="fas fa-chart-bar"></i> التقارير
+            </a>
 
-                        <a class="nav-link @(ViewContext.RouteData.Values["Controller"]?.ToString() == "Settings" ? "active" : "")"
-                           asp-controller="Settings" asp-action="Index">
-                            <i class="fas fa-cog"></i> الإعدادات
-                        </a>
-                    </nav>
-                </div>
+            <a class="nav-link @(ViewContext.RouteData.Values["Controller"]?.ToString() == "Settings" ? "active" : "")"
+               asp-controller="Settings" asp-action="Index">
+                <i class="fas fa-cog"></i> الإعدادات
+            </a>
+        </nav>
+    </div>
 
-                <!-- Desktop Main Content -->
-                <div class="col-md-10 main-content-desktop">
-                    @RenderBody()
-                </div>
-            </div>
+    <!-- Mobile Header -->
+    <div class="mobile-header d-md-none">
+        <button class="btn btn-link text-white p-0" type="button" data-bs-toggle="offcanvas" data-bs-target="#mobileMenu">
+            <i class="fas fa-bars fa-lg"></i>
+        </button>
+
+        <h5 class="text-white mb-0">
+            <i class="fas fa-wallet ms-1"></i>
+            متتبع المصروفات
+        </h5>
+
+        <a asp-controller="Settings" asp-action="Index" class="btn btn-link text-white p-0">
+            <i class="fas fa-cog fa-lg"></i>
+        </a>
+    </div>
+
+    <!-- Mobile Offcanvas -->
+    <div class="offcanvas offcanvas-start d-md-none" tabindex="-1" id="mobileMenu">
+        <div class="offcanvas-header">
+            <h5 class="text-white">
+                <i class="fas fa-wallet ms-2"></i>
+                القائمة
+            </h5>
+            <button type="button" class="btn-close btn-close-white" data-bs-dismiss="offcanvas"></button>
+        </div>
+
+        <div class="offcanvas-body p-0">
+            <nav class="nav flex-column">
+                <a class="nav-link @(ViewContext.RouteData.Values["Controller"]?.ToString() == "Home" ? "active" : "")"
+                   asp-controller="Home" asp-action="Index" data-bs-dismiss="offcanvas">
+                    <i class="fas fa-home"></i>
+                    <span>لوحة التحكم</span>
+                </a>
+
+                <a class="nav-link @(ViewContext.RouteData.Values["Controller"]?.ToString() == "Transactions" ? "active" : "")"
+                   asp-controller="Transactions" asp-action="Index" data-bs-dismiss="offcanvas">
+                    <i class="fas fa-list"></i>
+                    <span>العمليات</span>
+                </a>
+
+                <a class="nav-link @(ViewContext.RouteData.Values["Controller"]?.ToString() == "Reports" ? "active" : "")"
+                   asp-controller="Reports" asp-action="Index" data-bs-dismiss="offcanvas">
+                    <i class="fas fa-chart-bar"></i>
+                    <span>التقارير</span>
+                </a>
+
+                <a class="nav-link @(ViewContext.RouteData.Values["Controller"]?.ToString() == "Settings" ? "active" : "")"
+                   asp-controller="Settings" asp-action="Index" data-bs-dismiss="offcanvas">
+                    <i class="fas fa-cog"></i>
+                    <span>الإعدادات</span>
+                </a>
+            </nav>
         </div>
     </div>
 
-    <!-- MOBILE LAYOUT -->
-    <div class="d-md-none">
-        <!-- Mobile Header -->
-        <div class="mobile-header">
-            <button class="btn btn-link text-white p-0" type="button" data-bs-toggle="offcanvas" data-bs-target="#mobileMenu">
-                <i class="fas fa-bars fa-lg"></i>
-            </button>
+    <!-- Main Content -->
+    <div class="main-content">
+        @RenderBody()
+    </div>
 
-            <h5 class="text-white">
-                <i class="fas fa-wallet ms-1"></i>
-                متتبع المصروفات
-            </h5>
+    <!-- Mobile Bottom Nav -->
+    <div class="mobile-bottom-nav d-md-none">
+        <a asp-controller="Home" asp-action="Index"
+           class="@(ViewContext.RouteData.Values["Controller"]?.ToString() == "Home" ? "active" : "")">
+            <i class="fas fa-home"></i>
+            <span>الرئيسية</span>
+        </a>
 
-            <a asp-controller="Settings" asp-action="Index" class="btn btn-link text-white p-0">
-                <i class="fas fa-cog fa-lg"></i>
-            </a>
-        </div>
+        <a asp-controller="Transactions" asp-action="Index"
+           class="@(ViewContext.RouteData.Values["Controller"]?.ToString() == "Transactions" && ViewContext.RouteData.Values["Action"]?.ToString() != "Create" ? "active" : "")">
+            <i class="fas fa-list"></i>
+            <span>العمليات</span>
+        </a>
 
-        <!-- Mobile Offcanvas Menu -->
-        <div class="offcanvas offcanvas-start" tabindex="-1" id="mobileMenu">
-            <div class="offcanvas-header">
-                <h5 class="text-white">
-                    <i class="fas fa-wallet ms-2"></i>
-                    القائمة
-                </h5>
-                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="offcanvas"></button>
-            </div>
+        <a asp-controller="Transactions" asp-action="Create"
+           class="@(ViewContext.RouteData.Values["Action"]?.ToString() == "Create" ? "active" : "")">
+            <i class="fas fa-plus-circle"></i>
+            <span>إضافة</span>
+        </a>
 
-            <div class="offcanvas-body">
-                <nav class="nav flex-column">
-                    <a class="nav-link @(ViewContext.RouteData.Values["Controller"]?.ToString() == "Home" ? "active" : "")"
-                       asp-controller="Home" asp-action="Index"
-                       data-bs-dismiss="offcanvas">
-                        <i class="fas fa-home"></i>
-                        <span>لوحة التحكم</span>
-                    </a>
-
-                    <a class="nav-link @(ViewContext.RouteData.Values["Controller"]?.ToString() == "Transactions" ? "active" : "")"
-                       asp-controller="Transactions" asp-action="Index"
-                       data-bs-dismiss="offcanvas">
-                        <i class="fas fa-list"></i>
-                        <span>العمليات</span>
-                    </a>
-
-                    <a class="nav-link @(ViewContext.RouteData.Values["Controller"]?.ToString() == "Reports" ? "active" : "")"
-                       asp-controller="Reports" asp-action="Index"
-                       data-bs-dismiss="offcanvas">
-                        <i class="fas fa-chart-bar"></i>
-                        <span>التقارير</span>
-                    </a>
-
-                    <a class="nav-link @(ViewContext.RouteData.Values["Controller"]?.ToString() == "Settings" ? "active" : "")"
-                       asp-controller="Settings" asp-action="Index"
-                       data-bs-dismiss="offcanvas">
-                        <i class="fas fa-cog"></i>
-                        <span>الإعدادات</span>
-                    </a>
-                </nav>
-            </div>
-        </div>
-
-        <!-- Mobile Main Content -->
-        <div class="mobile-container">
-            @RenderBody()
-        </div>
-
-        <!-- Mobile Bottom Navigation -->
-        <div class="mobile-bottom-nav">
-            <a asp-controller="Home" asp-action="Index"
-               class="@(ViewContext.RouteData.Values["Controller"]?.ToString() == "Home" ? "active" : "")">
-                <i class="fas fa-home"></i>
-                <span>الرئيسية</span>
-            </a>
-
-            <a asp-controller="Transactions" asp-action="Index"
-               class="@(ViewContext.RouteData.Values["Controller"]?.ToString() == "Transactions" ? "active" : "")">
-                <i class="fas fa-list"></i>
-                <span>العمليات</span>
-            </a>
-
-            <a asp-controller="Transactions" asp-action="Create"
-               class="@(ViewContext.RouteData.Values["Action"]?.ToString() == "Create" ? "active" : "")">
-                <i class="fas fa-plus-circle"></i>
-                <span>إضافة</span>
-            </a>
-
-            <a asp-controller="Reports" asp-action="Index"
-               class="@(ViewContext.RouteData.Values["Controller"]?.ToString() == "Reports" ? "active" : "")">
-                <i class="fas fa-chart-bar"></i>
-                <span>التقارير</span>
-            </a>
-        </div>
+        <a asp-controller="Reports" asp-action="Index"
+           class="@(ViewContext.RouteData.Values["Controller"]?.ToString() == "Reports" ? "active" : "")">
+            <i class="fas fa-chart-bar"></i>
+            <span>التقارير</span>
+        </a>
     </div>
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
@@ -445,12 +326,8 @@
         if ('serviceWorker' in navigator) {
             window.addEventListener('load', () => {
                 navigator.serviceWorker.register('/service-worker.js')
-                    .then(registration => {
-                        console.log('✅ ServiceWorker registered:', registration.scope);
-                    })
-                    .catch(error => {
-                        console.log('❌ ServiceWorker registration failed:', error);
-                    });
+                    .then(reg => console.log('✅ SW registered'))
+                    .catch(err => console.log('❌ SW failed', err));
             });
         }
     </script>
