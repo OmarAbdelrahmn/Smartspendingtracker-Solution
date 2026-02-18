@@ -5,6 +5,10 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
     <title>@ViewData["Title"] - متتبع المصروفات</title>
 
+    <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate, max-age=0" />
+    <meta http-equiv="Pragma" content="no-cache" />
+    <meta http-equiv="Expires" content="-1" />
+
     <!-- PWA Meta Tags -->
     <meta name="theme-color" content="#1c1c1c" />
     <meta name="apple-mobile-web-app-capable" content="yes" />
@@ -330,6 +334,26 @@
                     .catch(err => console.log('❌ SW failed', err));
             });
         }
+    </script>
+
+    <script>
+        // Force hard reload on back/forward navigation
+        window.addEventListener('pageshow', function(event) {
+            if (event.persisted) {
+                window.location.reload(true);
+            }
+        });
+
+        // Add timestamp to all form submissions
+        document.querySelectorAll('form').forEach(function(form) {
+            form.addEventListener('submit', function() {
+                const input = document.createElement('input');
+                input.type = 'hidden';
+                input.name = '_';
+                input.value = Date.now();
+                form.appendChild(input);
+            });
+        });
     </script>
 </body>
 </html>
