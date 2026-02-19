@@ -30,19 +30,58 @@ namespace SpendingTracker.Controllers
             var totalSpent = transactions.Sum(t => t.Amount);
 
             var recordedDays = transactions.Select(t => t.Date.Date).Distinct().Count();
-            var averagePerDay = recordedDays > 0 ? totalSpent / recordedDays : 0;
 
             // Daily summary
-            var dailySummary = transactions
+            // Daily summary (INCLUDING ZERO DAYS)
+
+            var grouped = transactions
                 .GroupBy(t => t.Date.Date)
-                .Select(g => new DailySummary
+                .ToDictionary(
+                    g => g.Key,
+                    g => new
+                    {
+                        Amount = g.Sum(t => t.Amount),
+                        Count = g.Count()
+                    });
+
+            var dailySummary = new List<DailySummary>();
+
+            for (var date = startDate.Value.Date; date <= endDate.Value.Date; date = date.AddDays(1))
+            {
+                if (grouped.ContainsKey(date))
                 {
-                    Date = g.Key,
-                    Amount = g.Sum(t => t.Amount),
-                    Count = g.Count()
-                })
-                .OrderBy(d => d.Date)
-                .ToList();
+                    dailySummary.Add(new DailySummary
+                    {
+                        Date = date,
+                        Amount = grouped[date].Amount,
+                        Count = grouped[date].Count
+                    });
+                }
+                else
+                {
+                    dailySummary.Add(new DailySummary
+                    {
+                        Date = date,
+                        Amount = 0,
+                        Count = 0
+                    });
+                }
+            }
+
+            // Remove leading zero days (before first real data)
+            var firstDayWithData = dailySummary.FirstOrDefault(d => d.Amount > 0);
+
+            if (firstDayWithData != null)
+            {
+                dailySummary = dailySummary
+                    .SkipWhile(d => d.Amount == 0)
+                    .ToList();
+            }
+
+            // Average per day from first day with data to endDate
+            int daysCount = (int)(endDate.Value.Date - dailySummary.First().Date.Date).TotalDays + 1;
+
+            var averagePerDay = daysCount > 0 ? dailySummary.Sum(d => d.Amount) / daysCount : 0;
 
             // Top spending locations
             var topLocations = transactions

@@ -34,7 +34,6 @@ namespace SpendingTracker.Controllers
         }
 
         [HttpPost]
-        [ValidateAntiForgeryToken]
         public async Task<IActionResult> Update(UserSettings model)
         {
             if (ModelState.IsValid)

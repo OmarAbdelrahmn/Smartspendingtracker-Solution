@@ -48,7 +48,6 @@ namespace SpendingTracker.Controllers
         }
 
         [HttpPost]
-        [ValidateAntiForgeryToken]
         public async Task<IActionResult> Create(Transaction transaction)
         {
             if (ModelState.IsValid)
@@ -71,7 +70,6 @@ namespace SpendingTracker.Controllers
         }
 
         [HttpPost]
-        [ValidateAntiForgeryToken]
         public async Task<IActionResult> Edit(int id, Transaction transaction)
         {
             if (id != transaction.Id) return NotFound();
